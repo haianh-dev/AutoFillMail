@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SH27 · Tạo thư mời KOL</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>SH27 · Tạo thư mời KOL</h1>
+  <p class="sub">Ngày hội hiến máu Sắc Hồng Hy Vọng lần thứ XXVII — Ban Đối ngoại</p>
+</header>
+
+<div id="no-templates" class="banner-error" hidden>
+  Chưa build template. Chạy: <code>node scripts/build-templates.mjs</code>
+</div>
+
+<main class="layout">
+  <section class="panel form-panel">
+    <div class="field">
+      <span class="label">Loại thư mời <em>*</em></span>
+      <div class="segmented" id="type-group" role="radiogroup" aria-label="Loại thư mời">
+        <button type="button" class="seg" data-type="kmdh" aria-pressed="false">
+          <span class="seg-code">KMDH</span>
+          <span class="seg-name">Khách mời đồng hành</span>
+        </button>
+        <button type="button" class="seg" data-type="nvtch" aria-pressed="false">
+          <span class="seg-code">NVTCH</span>
+          <span class="seg-name">Nhân vật truyền cảm hứng</span>
+        </button>
+        <button type="button" class="seg" data-type="dsnh" aria-pressed="false">
+          <span class="seg-code">ĐSNH</span>
+          <span class="seg-name">Đại sứ ngày hội</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f-linhVuc">Lĩnh vực <em>*</em></label>
+      <input id="f-linhVuc" type="text" maxlength="80" placeholder="Ví dụ: Ca sĩ, Diễn viên, MC">
+      <p class="err" data-err="linhVuc"></p>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f-ngheDanh">Nghệ danh / Tên KOL <em>*</em></label>
+      <input id="f-ngheDanh" type="text" maxlength="80" placeholder="Ví dụ: Hà Anh Tuấn">
+      <p class="err" data-err="ngheDanh"></p>
+    </div>
+
+    <div class="field">
+      <span class="label">Xưng hô <em>*</em></span>
+      <div class="radio-row">
+        <label><input type="radio" name="xungHo" value="anh" checked> anh</label>
+        <label><input type="radio" name="xungHo" value="chị"> chị</label>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <p class="section-title">Người gửi</p>
+
+    <div class="field">
+      <label class="label" for="f-hoTen">Họ và tên của bạn <em>*</em></label>
+      <input id="f-hoTen" type="text" maxlength="80" placeholder="Ví dụ: Nguyễn Hải Anh">
+      <p class="err" data-err="hoTen"></p>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f-demTen">Đệm + tên của bạn <em>*</em></label>
+      <input id="f-demTen" type="text" maxlength="80" placeholder="Tự gợi ý từ họ tên">
+      <p class="err" data-err="demTen"></p>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f-ngay">Ngày hồi âm <em>*</em></label>
+      <input id="f-ngay" type="date">
+      <p class="err" data-err="ngay"></p>
+    </div>
+
+    <div class="actions">
+      <button id="btn-download" type="button" class="btn primary" disabled>Tải file HTML</button>
+      <button id="btn-copy" type="button" class="btn" disabled>Sao chép HTML</button>
+      <p class="hint" id="block-reason"></p>
+    </div>
+  </section>
+
+  <section class="panel preview-panel">
+    <div class="preview-head">
+      <h2>Xem trước</h2>
+      <button id="btn-open-tab" type="button" class="btn small">Mở tab mới</button>
+    </div>
+    <iframe id="preview" class="preview-frame" sandbox="allow-popups allow-popups-to-escape-sandbox" title="Xem trước thư mời"></iframe>
+  </section>
+</main>
+
+<div id="toast" class="toast" hidden>Đã sao chép</div>
+
+<script src="fill.js"></script>
+<script src="templates.generated.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

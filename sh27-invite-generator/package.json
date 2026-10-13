@@ -1,0 +1,11 @@
+{
+  "name": "sh27-invite-generator",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Điền placeholder vào 3 mẫu thư mời SH27 (KMDH / NVTCH / ĐSNH) và xuất HTML.",
+  "scripts": {
+    "build": "node scripts/build-templates.mjs",
+    "verify": "node scripts/verify.mjs",
+    "test": "npm run build && npm run verify"
+  }
+}
