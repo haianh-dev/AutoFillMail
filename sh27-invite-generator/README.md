@@ -33,5 +33,4 @@ Test kiểm tra: đúng 25 placeholder/file, output **giống hệt từng byte*
 ## Lưu ý
 
 - Không sửa gì trong `templates/` — mọi khác biệt nhỏ giữa 3 mẫu (dấu phẩy, 13px/14px…) là cố ý.
-- Xưng hô: `anh`/`chị` chữ thường giữa câu, tự viết hoa `Anh`/`Chị` ở 2 vị trí đầu câu trong mỗi thư (theo ảnh mẫu).
-- Dấu chấm sau tên người ký ở cuối thư được bỏ (`<em>Nguyễn Hải Anh</em>`, không có `.`) — token P5 gồm cả dấu chấm trong template.
+- Xưng hô: `Anh`/`Chị` viết hoa ở **mọi vị trí** (yêu cầu mới của sếp, trước đây là chữ thường). Dấu chấm sau tên người ký ở cuối thư được bỏ (`<em>Nguyễn Hải Anh</em>`, không có `.`) — token P5 gồm cả dấu chấm trong template.

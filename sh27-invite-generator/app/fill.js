@@ -114,7 +114,8 @@
     };
     return replaceTokens(templateHtml, function (key, ctx) {
       if (key === 'xungHo') {
-        return isSentenceStart(ctx.before) ? capFirst(xung) : xung;
+        // Yêu cầu mới của sếp: viết hoa "Anh"/"Chị" ở MỌI vị trí (không còn case thường)
+        return capFirst(xung);
       }
       return val[key];
     });

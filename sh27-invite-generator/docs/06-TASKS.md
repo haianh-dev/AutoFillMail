@@ -35,6 +35,7 @@
 - Năm trong ngày hồi âm lấy theo ngày người dùng chọn, không ép cứng 2026.
 
 ## Quyết định đã tự đưa ra (agent điền khi làm)
+- **Cập nhật theo yêu cầu của sếp (14/10/2026): xưng hô `Anh`/`Chị` viết hoa ở MỌI vị trí**, thay cho quy tắc cũ (thường giữa câu, hoa đầu câu — docs/02/03/05 ban đầu). `fill.js` luôn `capFirst(xung)`; hàm `isSentenceStart` vẫn được export nhưng `fill` không dùng nữa. Test C2/C7/C9/C10 và golden H đã cập nhật theo. Quy tắc mới đè lên "ảnh mẫu" cũ.
 - Tệp `package.json` đã tồn tại sẵn đúng nội dung yêu cầu → giữ nguyên, không tạo mới.
 - `validate()`: ô `ngay` ngoài bắt buộc không rỗng còn kiểm tra định dạng (phải là `yyyy-mm-dd` hợp lệ, kiểm qua `formatDate`).
 - `demTenTouched`: nếu người dùng xoá trống ô "Đệm + tên" → cờ tự reset, resume gợi ý từ `hoTen`; giá trị `demTen` nạp từ localStorage được coi là "đã sửa tay" để không ghi đè gợi ý.

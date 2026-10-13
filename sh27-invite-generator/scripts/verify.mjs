@@ -97,9 +97,9 @@ for (const name of Object.keys(TPL)) {
   const out = fill.fill(TPL[name], { ...BASE, type: name });
   test(`T-C1 ${name}`, 'Thân gửi đúng', () =>
     assert.ok(out.includes('Thân gửi <strong>Diễn viên Lưu Duy Khánh</strong>,')));
-  test(`T-C2 ${name}`, 'anh&nbsp;Lưu Duy Khánh ×5, Anh&nbsp;… ×1', () => {
-    assert.strictEqual(countMatches(out, /anh&nbsp;Lưu Duy Khánh/), 5);
-    assert.strictEqual(countMatches(out, /Anh&nbsp;Lưu Duy Khánh/), 1);
+  test(`T-C2 ${name}`, 'Anh&nbsp;Lưu Duy Khánh ×6 (viết hoa mọi vị trí)', () => {
+    assert.strictEqual(countMatches(out, /Anh&nbsp;Lưu Duy Khánh/), 6);
+    assert.strictEqual(countMatches(out, /anh&nbsp;Lưu Duy Khánh/), 0);
   });
   test(`T-C3 ${name}`, 'Em là Hải Anh', () =>
     assert.ok(out.includes('Em là Hải Anh - Phụ trách Đối ngoại')));
@@ -111,30 +111,21 @@ for (const name of Object.keys(TPL)) {
   });
   test(`T-C6 ${name}`, 'không sót placeholder', () =>
     assert.deepStrictEqual(fill.findLeftovers(out), []));
-  test(`T-C7 ${name}`, 'xưng hô chị: 5 thường + 1 hoa', () => {
+  test(`T-C7 ${name}`, 'xưng hô chị: viết hoa mọi vị trí', () => {
     const out2 = fill.fill(TPL[name], { ...BASE, xungHo: 'chị' });
     assert.ok(!out2.includes('anh&nbsp;Lưu Duy Khánh'));
     assert.ok(!out2.includes('Anh&nbsp;Lưu Duy Khánh'));
-    assert.strictEqual(countMatches(out2, /chị&nbsp;Lưu Duy Khánh/), 5);
-    assert.strictEqual(countMatches(out2, /Chị&nbsp;Lưu Duy Khánh/), 1);
-    assert.ok(!out2.includes('Anh&nbsp;'), 'còn Anh&nbsp; viết hoa');
-    assert.ok(!out2.includes('Chị&nbsp;') === false || true); // Chị&nbsp; đúng 1 lần đã đếm ở trên
+    assert.strictEqual(countMatches(out2, /Chị&nbsp;Lưu Duy Khánh/), 6);
+    assert.ok(!out2.includes('Anh&nbsp;'), 'còn Anh&nbsp; khi chọn chị');
   });
-  test(`T-C9 ${name}`, 'đúng 2 token P3 viết hoa: thứ 7 và thứ 12', () => {
-    let idx = 0;
-    const caps = [];
-    fill.replaceTokens(TPL[name], (key, ctx) => {
-      if (key === 'xungHo') {
-        idx++;
-        if (fill.isSentenceStart(ctx.before)) caps.push(idx);
-      }
-      return key;
-    });
-    assert.deepStrictEqual(caps, [7, 12], 'vị trí viết hoa: ' + JSON.stringify(caps));
+  test(`T-C9 ${name}`, 'không còn "anh"/"chị" viết thường nào từ token P3', () => {
+    // 13 token P3 đều viết hoa; kiểm tra output không còn "anh </strong>" / "hy vọng&nbsp;<strong>anh"
+    assert.ok(!out.includes('hy vọng&nbsp;<strong>anh</strong>'));
+    assert.ok(!/<strong>anh <\/strong>/.test(out));
   });
-  test(`T-C10 ${name}`, 'viết hoa đầu câu + thường giữa câu', () => {
+  test(`T-C10 ${name}`, 'viết hoa đầu câu và giữa câu', () => {
     assert.ok(out.includes('<strong>Anh </strong>có thể liên hệ'));
-    assert.ok(out.includes('hy vọng&nbsp;<strong>anh</strong> có thể tới'));
+    assert.ok(out.includes('hy vọng&nbsp;<strong>Anh</strong> có thể tới'));
   });
 }
 
@@ -242,16 +233,16 @@ const GOLDEN_OUT = fill.fill(TPL.kmdh, BASE);
 const GOLDEN_TEXT = visibleText(GOLDEN_OUT);
 const GOLDEN_SENTENCES = [
   'Thân gửi Diễn viên Lưu Duy Khánh,',
-  'xin gửi lời chúc sức khỏe và lời chào trân trọng nhất đến anh Lưu Duy Khánh.',
+  'xin gửi lời chúc sức khỏe và lời chào trân trọng nhất đến Anh Lưu Duy Khánh.',
   'Em là Hải Anh - Phụ trách Đối ngoại tại Ngày hội hiến máu Sắc Hồng Hy Vọng lần thứ XXVII',
-  'Thông qua các bài chia sẻ của anh Lưu Duy Khánh, Sắc Hồng Hy Vọng nhận thấy anh là người truyền cảm hứng',
-  'xin đặc biệt gửi lá thư này tới anh với mong muốn mời anh Lưu Duy Khánh trở thành KHÁCH MỜI ĐỒNG HÀNH',
-  'mong anh Lưu Duy Khánh ghé thăm bản Timeline ngày hội',
-  'Anh Lưu Duy Khánh thân mến, sự đồng hành và hỗ trợ của anh sẽ là động lực',
-  'thông qua những thông điệp và hành động ý nghĩa của anh Lưu Duy Khánh, chương trình',
-  'Ban Tổ chức hy vọng anh có thể tới tham dự',
-  'rất mong nhận được hồi âm từ anh Lưu Duy Khánh trước ngày 16/10/2026. Anh có thể liên hệ Ms. Thanh Huyền (0335 401 260)',
-  'Chúc anh có một ngày tốt lành!',
+  'Thông qua các bài chia sẻ của Anh Lưu Duy Khánh, Sắc Hồng Hy Vọng nhận thấy Anh là người truyền cảm hứng',
+  'xin đặc biệt gửi lá thư này tới Anh với mong muốn mời Anh Lưu Duy Khánh trở thành KHÁCH MỜI ĐỒNG HÀNH',
+  'mong Anh Lưu Duy Khánh ghé thăm bản Timeline ngày hội',
+  'Anh Lưu Duy Khánh thân mến, sự đồng hành và hỗ trợ của Anh sẽ là động lực',
+  'thông qua những thông điệp và hành động ý nghĩa của Anh Lưu Duy Khánh, chương trình',
+  'Ban Tổ chức hy vọng Anh có thể tới tham dự',
+  'rất mong nhận được hồi âm từ Anh Lưu Duy Khánh trước ngày 16/10/2026. Anh có thể liên hệ Ms. Thanh Huyền (0335 401 260)',
+  'Chúc Anh có một ngày tốt lành!',
   'Nguyễn Hải Anh', // dòng ký tên, không có dấu chấm cuối
 ];
 GOLDEN_SENTENCES.forEach((sentence, i) => {
