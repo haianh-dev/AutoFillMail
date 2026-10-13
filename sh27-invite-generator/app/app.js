@@ -142,6 +142,15 @@
     });
   });
 
+  // ---- Thống kê ẩn danh (GoatCounter) — chỉ tên sự kiện, KHÔNG gửi dữ liệu người dùng nhập ----
+  function trackEvent(name) {
+    try {
+      if (window.goatcounter && typeof window.goatcounter.count === 'function') {
+        window.goatcounter.count({ path: name, title: name, event: true });
+      }
+    } catch (e) { /* offline / chặn mạng — bỏ qua, không ảnh hưởng app */ }
+  }
+
   // ---- Tải về (FR-3) ----
   function currentFilename() {
     return 'SH27-' + values.type + '-' + (F.slugify(values.ngheDanh) || 'kol') + '.html';
@@ -154,6 +163,7 @@
 
   btnDownload.addEventListener('click', function () {
     if (!lastValidHtml) return;
+    trackEvent('tai-' + values.type);
     var blob = new Blob([lastValidHtml], { type: 'text/html;charset=utf-8' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
@@ -190,6 +200,7 @@
 
   btnCopy.addEventListener('click', function () {
     if (!lastValidHtml) return;
+    trackEvent('copy-' + values.type);
     var html = lastValidHtml;
     function done(ok) {
       showToast(ok ? 'Đã sao chép' : 'Không sao chép được — hãy dùng nút Tải file HTML');
