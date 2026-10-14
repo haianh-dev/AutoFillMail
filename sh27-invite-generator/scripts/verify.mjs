@@ -127,6 +127,13 @@ for (const name of Object.keys(TPL)) {
     assert.ok(out.includes('<strong>Anh </strong>có thể liên hệ'));
     assert.ok(out.includes('hy vọng&nbsp;<strong>Anh</strong> có thể tới'));
   });
+  for (const [value, word] of [['cô', 'Cô'], ['chú', 'Chú'], ['anh chị', 'Anh Chị'], ['band', 'Band']]) {
+    test(`T-C11 ${name} xưng hô "${value}"`, `viết hoa ${word} mọi vị trí (×6)`, () => {
+      const out2 = fill.fill(TPL[name], { ...BASE, xungHo: value });
+      assert.strictEqual(countMatches(out2, new RegExp(word + '&nbsp;Lưu Duy Khánh', 'g')), 6);
+      assert.ok(!out2.includes('Anh&nbsp;Lưu Duy Khánh'), 'còn xưng hô cũ');
+    });
+  }
 }
 
 // ---- D. Khác biệt 3 template ----

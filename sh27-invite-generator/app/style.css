@@ -12,6 +12,9 @@
 
 * { box-sizing: border-box; }
 
+/* .layout có display:grid sẽ đè attribute hidden của trình duyệt → ép ẩn lại */
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
@@ -139,7 +142,7 @@ input.invalid { border-color: var(--err); }
 .seg-code { font-weight: 700; font-size: 15px; color: var(--brand-dark); }
 .seg-name { font-size: 11px; color: var(--muted); }
 
-.radio-row { display: flex; gap: 18px; font-size: 14px; }
+.radio-row { display: flex; flex-wrap: wrap; gap: 10px 18px; font-size: 14px; }
 .radio-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
 
 .divider { border: none; border-top: 1px dashed var(--line); margin: 18px 0 10px; }

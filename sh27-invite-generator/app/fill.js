@@ -104,7 +104,15 @@
 
   function fill(templateHtml, values) {
     var v = values || {};
-    var xung = v.xungHo === 'chị' ? 'chị' : 'anh';
+    var XUNG_HO_BY_VALUE = {
+      anh: 'Anh',
+      chị: 'Chị',
+      cô: 'Cô',
+      chú: 'Chú',
+      'anh chị': 'Anh Chị',
+      band: 'Band',
+    };
+    var xung = XUNG_HO_BY_VALUE[v.xungHo] || 'Anh';
     var val = {
       linhVuc: escapeHtml(normalizeText(v.linhVuc)),
       ngheDanh: escapeHtml(normalizeText(v.ngheDanh)),
