@@ -18,6 +18,7 @@
     linhVuc: '',
     ngheDanh: '',
     xungHo: 'anh',
+    tuGoi: 'em',
     hoTen: '',
     demTen: '',
     ngay: '',
@@ -140,6 +141,12 @@
   document.querySelectorAll('input[name="xungHo"]').forEach(function (radio) {
     radio.addEventListener('change', function () {
       if (radio.checked) { values.xungHo = radio.value; render(); }
+    });
+  });
+
+  document.querySelectorAll('input[name="tuGoi"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      if (radio.checked) { values.tuGoi = radio.value; render(); }
     });
   });
 

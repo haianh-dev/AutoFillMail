@@ -103,6 +103,17 @@ for (const name of Object.keys(TPL)) {
   });
   test(`T-C3 ${name}`, 'Em là Hải Anh', () =>
     assert.ok(out.includes('Em là Hải Anh - Phụ trách Đối ngoại')));
+  for (const [value, lower, cap] of [['con', 'con', 'Con'], ['cháu', 'cháu', 'Cháu']]) {
+    test(`T-C12 ${name} tự xưng "${value}"`, 'thay em→' + value + ' giữ hoa/thường, giữ thẻ <em>', () => {
+      const out2 = fill.fill(TPL[name], { ...BASE, tuGoi: value });
+      assert.ok(out2.includes(cap + ' là Hải Anh - Phụ trách Đối ngoại'), 'sai chỗ "Em là"');
+      assert.ok(out2.includes('chúng ' + lower), 'sai chỗ "chúng em"');
+      assert.ok(out2.includes('Chúng ' + lower + ' tin rằng'), 'sai chỗ "Chúng em tin"');
+      assert.ok(!/(?<![\wÀ-ỹ])[Ee]m(?![\wÀ-ỹ])/.test(out2.replace(/<[^>]*>/g, '')), 'còn sót em/Em ngoài thẻ');
+      assert.ok(/<em>/.test(out2), 'mất thẻ <em> in nghiêng');
+      assert.ok(out2.includes('<em>Địa điểm:</em>'), 'mất thẻ <em> Địa điểm');
+    });
+  }
   test(`T-C4 ${name}`, 'ngày 16/10/2026', () =>
     assert.ok(out.includes('<em>trước ngày 16/10/2026</em>')));
   test(`T-C5 ${name}`, 'ký tên không có dấu chấm', () => {

@@ -102,6 +102,20 @@
     return w.charAt(0).toUpperCase() + w.slice(1);
   }
 
+  // Tự xưng: thay từ "em"/"Em" trong template bằng "con"/"cháu" (giữ hoa/thường
+  // theo vị trí gốc). Chỉ thay trong đoạn text ngoài thẻ HTML để không đụng <em>
+  // (in nghiêng); ranh giới từ dùng \w + khoảng À-ỹ để không khớp "xem", "email"…
+  var EM_TOKEN_RE = /(^|[^\w\u00C0-\u1EF9])([Ee]m)(?![\w\u00C0-\u1EF9])/g;
+  function replaceSelfRef(tpl, word) {
+    return String(tpl).split(/(<[^>]*>)/).map(function (seg) {
+      if (seg.charAt(0) === '<') return seg;
+      var cap = capFirst(word);
+      return seg.replace(EM_TOKEN_RE, function (m, pre, tok) {
+        return pre + (tok === 'Em' ? cap : word);
+      });
+    }).join('');
+  }
+
   function fill(templateHtml, values) {
     var v = values || {};
     var XUNG_HO_BY_VALUE = {
@@ -113,6 +127,10 @@
       band: 'Band',
     };
     var xung = XUNG_HO_BY_VALUE[v.xungHo] || 'Anh';
+    // Tự xưng thay cho "em": chỉ con/cháu cần thay; 'em' giữ nguyên template
+    var tpl = (v.tuGoi === 'con' || v.tuGoi === 'cháu')
+      ? replaceSelfRef(templateHtml, v.tuGoi)
+      : templateHtml;
     var val = {
       linhVuc: escapeHtml(normalizeText(v.linhVuc)),
       ngheDanh: escapeHtml(normalizeText(v.ngheDanh)),
@@ -120,7 +138,7 @@
       hoTen: escapeHtml(normalizeText(v.hoTen)),
       ngay: formatDate(v.ngay),
     };
-    return replaceTokens(templateHtml, function (key, ctx) {
+    return replaceTokens(tpl, function (key, ctx) {
       if (key === 'xungHo') {
         // Yêu cầu mới của sếp: viết hoa "Anh"/"Chị" ở MỌI vị trí (không còn case thường)
         return capFirst(xung);
@@ -149,6 +167,7 @@
     validate: validate,
     isSentenceStart: isSentenceStart,
     replaceTokens: replaceTokens,
+    replaceSelfRef: replaceSelfRef,
     fill: fill,
     findLeftovers: findLeftovers,
   };
