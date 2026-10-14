@@ -142,6 +142,97 @@
     });
   });
 
+  // ---- Chuyển tab ----
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (tab) {
+    tab.addEventListener('click', function () {
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (t) {
+        t.setAttribute('aria-selected', String(t === tab));
+      });
+      document.getElementById('tab-invite').hidden = tab.dataset.tab !== 'invite';
+      document.getElementById('tab-subject').hidden = tab.dataset.tab !== 'subject';
+    });
+  });
+
+  // ---- Tab chủ đề email (FR-7): sinh subject từ Lĩnh vực + Nghệ danh ----
+  var SUBJECT_PREFIX = 'Sắc Hồng Hy Vọng XXVII | Thư mời ';
+  var SUBJECT_ROLES = {
+    kmdh: 'Khách mời đồng hành',
+    nvtch: 'Nhân vật truyền cảm hứng',
+    dsnh: 'Đại sứ ngày hội',
+  };
+  var LS_SUBJECT_KEY = 'sh27.subject';
+  var subjectInputs = {
+    linhVuc: $('#s-linhVuc'),
+    ngheDanh: $('#s-ngheDanh'),
+  };
+  var subjectValues = { linhVuc: '', ngheDanh: '' };
+  var subjectButtons = {
+    kmdh: $('#btn-copy-subject-kmdh'),
+    nvtch: $('#btn-copy-subject-nvtch'),
+    dsnh: $('#btn-copy-subject-dsnh'),
+  };
+  var subjectOutputs = {
+    kmdh: $('#subject-kmdh'),
+    nvtch: $('#subject-nvtch'),
+    dsnh: $('#subject-dsnh'),
+  };
+
+  function buildSubject(type, linhVuc, ngheDanh) {
+    var lv = F.normalizeText(linhVuc);
+    var nd = F.normalizeText(ngheDanh);
+    if (!lv || !nd) return '';
+    return SUBJECT_PREFIX + SUBJECT_ROLES[type] + ' | ' + lv + ' ' + nd;
+  }
+
+  function renderSubjects() {
+    ['kmdh', 'nvtch', 'dsnh'].forEach(function (type) {
+      var s = buildSubject(type, subjectValues.linhVuc, subjectValues.ngheDanh);
+      subjectOutputs[type].textContent = s;
+      subjectButtons[type].disabled = !s;
+    });
+  }
+
+  function loadSubject() {
+    try {
+      var saved = JSON.parse(localStorage.getItem(LS_SUBJECT_KEY) || '{}');
+      if (saved.linhVuc) { subjectValues.linhVuc = saved.linhVuc; subjectInputs.linhVuc.value = saved.linhVuc; }
+      if (saved.ngheDanh) { subjectValues.ngheDanh = saved.ngheDanh; subjectInputs.ngheDanh.value = saved.ngheDanh; }
+    } catch (e) { /* bỏ qua */ }
+  }
+
+  function saveSubject() {
+    try {
+      localStorage.setItem(LS_SUBJECT_KEY, JSON.stringify(subjectValues));
+    } catch (e) { /* bỏ qua */ }
+  }
+
+  subjectInputs.linhVuc.addEventListener('input', function () {
+    subjectValues.linhVuc = subjectInputs.linhVuc.value;
+    renderSubjects();
+    saveSubject();
+  });
+  subjectInputs.ngheDanh.addEventListener('input', function () {
+    subjectValues.ngheDanh = subjectInputs.ngheDanh.value;
+    renderSubjects();
+    saveSubject();
+  });
+
+  ['kmdh', 'nvtch', 'dsnh'].forEach(function (type) {
+    subjectButtons[type].addEventListener('click', function () {
+      var s = buildSubject(type, subjectValues.linhVuc, subjectValues.ngheDanh);
+      if (!s) return;
+      trackEvent('copy-subject-' + type);
+      function done(ok) {
+        showToast(ok ? 'Đã sao chép chủ đề' : 'Không sao chép được — hãy bôi đen và copy thủ công');
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(s).then(function () { done(true); }, function () { done(copyFallback(s)); });
+      } else {
+        done(copyFallback(s));
+      }
+    });
+  });
+
   // ---- Thống kê ẩn danh (GoatCounter) — chỉ tên sự kiện, KHÔNG gửi dữ liệu người dùng nhập ----
   function trackEvent(name) {
     try {
@@ -198,19 +289,56 @@
     return ok;
   }
 
+  // ---- Sao chép HTML giàu định dạng (FR-4): dán vào Gmail là nội dung hiển thị, căn trái ----
+  // Chỉ áp dụng cho clipboard; file tải về vẫn giữ nguyên từng byte như template.
+  function toPasteHtml(html) {
+    return String(html)
+      .replace(/<body([^>]*)>/i, '<body$1><div style="text-align:left;" align="left">')
+      .replace(/<\/body\s*>/i, '</div></body>');
+  }
+
+  // Firefox/clipboard API không khả dụng → render tạm ngoài màn hình rồi copy vùng chọn
+  function copyHtmlFallback(html) {
+    var div = document.createElement('div');
+    div.contentEditable = 'true';
+    div.style.position = 'fixed';
+    div.style.left = '-9999px';
+    div.innerHTML = toPasteHtml(html); // dữ liệu đã được escapeHtml trong fill.js, chỉ dùng cho clipboard tạm
+    document.body.appendChild(div);
+    var range = document.createRange();
+    range.selectNodeContents(div);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    sel.removeAllRanges();
+    document.body.removeChild(div);
+    return ok;
+  }
+
   btnCopy.addEventListener('click', function () {
     if (!lastValidHtml) return;
     trackEvent('copy-' + values.type);
     var html = lastValidHtml;
     function done(ok) {
-      showToast(ok ? 'Đã sao chép' : 'Không sao chép được — hãy dùng nút Tải file HTML');
+      showToast(ok ? 'Đã sao chép — dán trực tiếp vào Gmail' : 'Không sao chép được — hãy dùng nút Tải file HTML');
       if (ok) saveSender();
     }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(html).then(function () { done(true); }, function () { done(copyFallback(html)); });
-    } else {
-      done(copyFallback(html));
+    if (navigator.clipboard && window.ClipboardItem && typeof navigator.clipboard.write === 'function') {
+      var item = null;
+      try {
+        item = new ClipboardItem({
+          'text/html': new Blob([toPasteHtml(html)], { type: 'text/html' }),
+          'text/plain': new Blob([html], { type: 'text/plain' }),
+        });
+      } catch (e) { item = null; }
+      if (item) {
+        navigator.clipboard.write([item]).then(function () { done(true); }, function () { done(copyHtmlFallback(html)); });
+        return;
+      }
     }
+    done(copyHtmlFallback(html));
   });
 
   // ---- Mở tab mới (FR-5) ----
@@ -223,6 +351,8 @@
 
   // ---- Khởi động ----
   loadSender();
+  loadSubject();
+  renderSubjects();
   var firstSeg = typeGroup.querySelector('.seg[data-type="kmdh"]');
   if (firstSeg) firstSeg.setAttribute('aria-pressed', 'true');
   render();

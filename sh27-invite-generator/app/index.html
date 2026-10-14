@@ -16,7 +16,12 @@
   Chưa build template. Chạy: <code>node scripts/build-templates.mjs</code>
 </div>
 
-<main class="layout">
+<nav class="tabs" aria-label="Chức năng">
+  <button type="button" class="tab" data-tab="invite" aria-selected="true">Thư mời</button>
+  <button type="button" class="tab" data-tab="subject" aria-selected="false">Chủ đề email</button>
+</nav>
+
+<main class="layout" id="tab-invite">
   <section class="panel form-panel">
     <div class="field">
       <span class="label">Loại thư mời <em>*</em></span>
@@ -79,7 +84,7 @@
 
     <div class="actions">
       <button id="btn-download" type="button" class="btn primary" disabled>Tải file HTML</button>
-      <button id="btn-copy" type="button" class="btn" disabled>Sao chép HTML</button>
+      <button id="btn-copy" type="button" class="btn" disabled>Sao chép HTML (dán vào Gmail)</button>
       <p class="hint" id="block-reason"></p>
     </div>
   </section>
@@ -90,6 +95,46 @@
       <button id="btn-open-tab" type="button" class="btn small">Mở tab mới</button>
     </div>
     <iframe id="preview" class="preview-frame" sandbox="allow-popups allow-popups-to-escape-sandbox" title="Xem trước thư mời"></iframe>
+  </section>
+</main>
+
+<main class="layout" id="tab-subject" hidden>
+  <section class="panel">
+    <p class="section-title">Thông tin chung</p>
+    <div class="field">
+      <label class="label" for="s-linhVuc">Lĩnh vực <em>*</em></label>
+      <input id="s-linhVuc" type="text" maxlength="80" placeholder="Ví dụ: Vận động viên, Ca sĩ, MC">
+    </div>
+    <div class="field">
+      <label class="label" for="s-ngheDanh">Nghệ danh / Tên <em>*</em></label>
+      <input id="s-ngheDanh" type="text" maxlength="80" placeholder="Ví dụ: Nguyễn Thị Thanh Nhã">
+    </div>
+    <p class="subject-hint">Chủ đề được tạo tự động theo mẫu: <code>Sắc Hồng Hy Vọng XXVII | Thư mời &lt;đối tượng&gt; | &lt;Lĩnh vực&gt; &lt;Nghệ danh/tên&gt;</code></p>
+  </section>
+
+  <section class="panel">
+    <div class="preview-head"><h2>Chủ đề email</h2></div>
+    <div class="subject-row">
+      <span class="subject-role">KMDH · Khách mời đồng hành</span>
+      <div class="subject-line">
+        <output id="subject-kmdh" class="subject-text"></output>
+        <button id="btn-copy-subject-kmdh" type="button" class="btn small" disabled>Sao chép</button>
+      </div>
+    </div>
+    <div class="subject-row">
+      <span class="subject-role">NVTCH · Nhân vật truyền cảm hứng</span>
+      <div class="subject-line">
+        <output id="subject-nvtch" class="subject-text"></output>
+        <button id="btn-copy-subject-nvtch" type="button" class="btn small" disabled>Sao chép</button>
+      </div>
+    </div>
+    <div class="subject-row">
+      <span class="subject-role">ĐSNH · Đại sứ ngày hội</span>
+      <div class="subject-line">
+        <output id="subject-dsnh" class="subject-text"></output>
+        <button id="btn-copy-subject-dsnh" type="button" class="btn small" disabled>Sao chép</button>
+      </div>
+    </div>
   </section>
 </main>
 
