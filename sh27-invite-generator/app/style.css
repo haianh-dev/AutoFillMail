@@ -81,7 +81,7 @@ body {
   word-break: break-word;
   min-height: 39px;
 }
-.subject-text:empty::before { content: "Nhập Lĩnh vực và Nghệ danh/tên ở cột bên trái…"; color: var(--muted); font-style: italic; }
+.subject-text:empty::before { content: "Nhập Lĩnh vực và Nghệ danh/tên ở tab Thư mời…"; color: var(--muted); font-style: italic; }
 
 .layout {
   display: grid;

@@ -71,6 +71,7 @@
     var tpl = window.SH27_TEMPLATES[values.type];
     var html = F.fill(tpl, values);
     preview.srcdoc = html;
+    renderSubjects();
 
     var v = F.validate(values);
     var leftovers = F.findLeftovers(html);
@@ -153,19 +154,13 @@
     });
   });
 
-  // ---- Tab chủ đề email (FR-7): sinh subject từ Lĩnh vực + Nghệ danh ----
+  // ---- Tab chủ đề email (FR-7): dùng chung Lĩnh vực + Nghệ danh của form Thư mời ----
   var SUBJECT_PREFIX = 'Sắc Hồng Hy Vọng XXVII | Thư mời ';
   var SUBJECT_ROLES = {
     kmdh: 'Khách mời đồng hành',
     nvtch: 'Nhân vật truyền cảm hứng',
     dsnh: 'Đại sứ ngày hội',
   };
-  var LS_SUBJECT_KEY = 'sh27.subject';
-  var subjectInputs = {
-    linhVuc: $('#s-linhVuc'),
-    ngheDanh: $('#s-ngheDanh'),
-  };
-  var subjectValues = { linhVuc: '', ngheDanh: '' };
   var subjectButtons = {
     kmdh: $('#btn-copy-subject-kmdh'),
     nvtch: $('#btn-copy-subject-nvtch'),
@@ -177,49 +172,24 @@
     dsnh: $('#subject-dsnh'),
   };
 
-  function buildSubject(type, linhVuc, ngheDanh) {
-    var lv = F.normalizeText(linhVuc);
-    var nd = F.normalizeText(ngheDanh);
+  function buildSubject(type) {
+    var lv = F.normalizeText(values.linhVuc);
+    var nd = F.normalizeText(values.ngheDanh);
     if (!lv || !nd) return '';
     return SUBJECT_PREFIX + SUBJECT_ROLES[type] + ' | ' + lv + ' ' + nd;
   }
 
   function renderSubjects() {
     ['kmdh', 'nvtch', 'dsnh'].forEach(function (type) {
-      var s = buildSubject(type, subjectValues.linhVuc, subjectValues.ngheDanh);
+      var s = buildSubject(type);
       subjectOutputs[type].textContent = s;
       subjectButtons[type].disabled = !s;
     });
   }
 
-  function loadSubject() {
-    try {
-      var saved = JSON.parse(localStorage.getItem(LS_SUBJECT_KEY) || '{}');
-      if (saved.linhVuc) { subjectValues.linhVuc = saved.linhVuc; subjectInputs.linhVuc.value = saved.linhVuc; }
-      if (saved.ngheDanh) { subjectValues.ngheDanh = saved.ngheDanh; subjectInputs.ngheDanh.value = saved.ngheDanh; }
-    } catch (e) { /* bỏ qua */ }
-  }
-
-  function saveSubject() {
-    try {
-      localStorage.setItem(LS_SUBJECT_KEY, JSON.stringify(subjectValues));
-    } catch (e) { /* bỏ qua */ }
-  }
-
-  subjectInputs.linhVuc.addEventListener('input', function () {
-    subjectValues.linhVuc = subjectInputs.linhVuc.value;
-    renderSubjects();
-    saveSubject();
-  });
-  subjectInputs.ngheDanh.addEventListener('input', function () {
-    subjectValues.ngheDanh = subjectInputs.ngheDanh.value;
-    renderSubjects();
-    saveSubject();
-  });
-
   ['kmdh', 'nvtch', 'dsnh'].forEach(function (type) {
     subjectButtons[type].addEventListener('click', function () {
-      var s = buildSubject(type, subjectValues.linhVuc, subjectValues.ngheDanh);
+      var s = buildSubject(type);
       if (!s) return;
       trackEvent('copy-subject-' + type);
       function done(ok) {
@@ -351,7 +321,6 @@
 
   // ---- Khởi động ----
   loadSender();
-  loadSubject();
   renderSubjects();
   var firstSeg = typeGroup.querySelector('.seg[data-type="kmdh"]');
   if (firstSeg) firstSeg.setAttribute('aria-pressed', 'true');
