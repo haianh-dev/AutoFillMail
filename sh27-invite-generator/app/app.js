@@ -28,18 +28,9 @@
   var lastValidHtml = null;
   var blobUrl = null;
 
-  // ---- Trạng thái tab HTTT (mail trả lời khi bị từ chối & ngỏ lời hỗ trợ truyền thông) ----
-  var httt = { linhVuc: '', nntTen: '', xungHo: 'anh', tuGoi: 'em', hoTen: '' };
-  var inputsHttt = {
-    linhVuc: $('#f2-linhVuc'),
-    nntTen: $('#f2-nntTen'),
-    hoTen: $('#f2-hoTen'),
-  };
-  var previewHttt = $('#preview-httt');
-  var btnDownloadHttt = $('#btn-download-httt');
-  var btnCopyHttt = $('#btn-copy-httt');
-  var blockReasonHttt = $('#block-reason-httt');
-  var lastValidHtmlHttt = null;
+  // ---- Trạng thái tab HTTT (qua quản lý) & HTTT-NS (gửi thẳng nghệ sĩ) ----
+  var htttState = { quanLy: '', nntTen: '', xungHoQL: 'anh', xungHoNS: 'anh', tuGoi: 'em', hoTen: '' };
+  var htttNsState = { nntTen: '', xungHoNS: 'anh', tuGoi: 'em', hoTen: '' };
 
   // ---- Phần tử DOM ----
   var $ = function (sel) { return document.querySelector(sel); };
@@ -81,7 +72,11 @@
       var saved = JSON.parse(raw);
       if (saved.hoTen) {
         values.hoTen = saved.hoTen; inputs.hoTen.value = saved.hoTen;
-        httt.hoTen = saved.hoTen; inputsHttt.hoTen.value = saved.hoTen;
+        // seed cả 2 flow HTTT (được tạo sau nhưng loadSender luôn chạy sau cùng)
+        [htttFlow, htttNsFlow].forEach(function (flow) {
+          flow.state.hoTen = saved.hoTen;
+          flow.inputs.hoTen.value = saved.hoTen;
+        });
       }
       if (saved.demTen) { values.demTen = saved.demTen; inputs.demTen.value = saved.demTen; demTenTouched = true; }
       if (saved.ngay) { values.ngay = saved.ngay; inputs.ngay.value = saved.ngay; }
@@ -180,58 +175,139 @@
       document.getElementById('tab-invite').hidden = tab.dataset.tab !== 'invite';
       document.getElementById('tab-subject').hidden = tab.dataset.tab !== 'subject';
       document.getElementById('tab-httt').hidden = tab.dataset.tab !== 'httt';
+      document.getElementById('tab-httt-ns').hidden = tab.dataset.tab !== 'httt-ns';
     });
   });
 
-  // ---- Tab Mail HTTT: mẫu thư trả lời khi bị từ chối & ngỏ lời hỗ trợ truyền thông ----
-  function renderHttt() {
-    var html = F.fill(window.SH27_TEMPLATES.httt, httt);
-    previewHttt.srcdoc = html;
+  // ---- Tab Mail HTTT & HTTT-NS: cùng một mẫu logic, khác form/template ----
+  // cfg: type, state, inputs {key: selector}, radios [{name, key}], preview/btnDownload/btnCopy/blockReason selectors, errAttr
+  function makeHtttFlow(cfg) {
+    var state = cfg.state;
+    var inputs = {};
+    Object.keys(cfg.inputs).forEach(function (k) { inputs[k] = $(cfg.inputs[k]); });
+    var preview = $(cfg.preview);
+    var btnDownload = $(cfg.btnDownload);
+    var btnCopy = $(cfg.btnCopy);
+    var blockReason = $(cfg.blockReason);
+    var lastValid = null;
 
-    var v = F.validate(Object.assign({ type: 'httt' }, httt));
-    var leftovers = F.findLeftovers(html);
-    var canExport = v.ok && leftovers.length === 0;
+    function render() {
+      var html = F.fill(window.SH27_TEMPLATES[cfg.type], state);
+      preview.srcdoc = html;
 
-    btnDownloadHttt.disabled = !canExport;
-    btnCopyHttt.disabled = !canExport;
-    lastValidHtmlHttt = canExport ? html : null;
+      var v = F.validate(Object.assign({ type: cfg.type }, state));
+      var leftovers = F.findLeftovers(html);
+      var canExport = v.ok && leftovers.length === 0;
 
-    if (canExport) {
-      blockReasonHttt.textContent = '';
-    } else {
-      var missing = Object.keys(v.errors).length > 0;
-      blockReasonHttt.textContent = leftovers.length > 0
-        ? 'Còn sót placeholder (dữ liệu nhập chứa ký tự giống placeholder) — không thể tải.'
-        : (missing ? 'Vui lòng điền đủ các ô bắt buộc để tải hoặc sao chép.' : '');
+      btnDownload.disabled = !canExport;
+      btnCopy.disabled = !canExport;
+      lastValid = canExport ? html : null;
+
+      if (canExport) {
+        blockReason.textContent = '';
+      } else {
+        var missing = Object.keys(v.errors).length > 0;
+        blockReason.textContent = leftovers.length > 0
+          ? 'Còn sót placeholder (dữ liệu nhập chứa ký tự giống placeholder) — không thể tải.'
+          : (missing ? 'Vui lòng điền đủ các ô bắt buộc để tải hoặc sao chép.' : '');
+      }
+
+      Object.keys(inputs).forEach(function (key) {
+        var errEl = document.querySelector('[' + cfg.errAttr + '="' + key + '"]');
+        var msg = v.errors[key] || '';
+        if (errEl) errEl.textContent = msg;
+        if (inputs[key]) inputs[key].classList.toggle('invalid', !!msg);
+      });
     }
 
-    ['linhVuc', 'nntTen', 'hoTen'].forEach(function (key) {
-      var errEl = document.querySelector('[data-err2="' + key + '"]');
-      var msg = v.errors[key] || '';
-      if (errEl) errEl.textContent = msg;
-      if (inputsHttt[key]) inputsHttt[key].classList.toggle('invalid', !!msg);
+    function scheduleRender() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(render, DEBOUNCE_MS);
+    }
+
+    Object.keys(inputs).forEach(function (key) {
+      inputs[key].addEventListener('input', function () { state[key] = inputs[key].value; scheduleRender(); });
     });
+
+    cfg.radios.forEach(function (r) {
+      document.querySelectorAll('input[name="' + r.name + '"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+          if (radio.checked) { state[r.key] = radio.value; render(); }
+        });
+      });
+    });
+
+    btnDownload.addEventListener('click', function () {
+      if (!lastValid) return;
+      trackEvent('tai-' + cfg.type);
+      var blob = new Blob([lastValid], { type: 'text/html;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'SH27-' + cfg.type + '-' + (F.slugify(state.nntTen) || 'nnt') + '.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      saveSender({ hoTen: state.hoTen });
+    });
+
+    btnCopy.addEventListener('click', function () {
+      if (!lastValid) return;
+      trackEvent('copy-' + cfg.type);
+      var html = lastValid;
+      function done(ok) {
+        showToast(ok ? 'Đã sao chép — dán trực tiếp vào Gmail' : 'Không sao chép được — hãy dùng nút Tải file HTML');
+        if (ok) saveSender({ hoTen: state.hoTen });
+      }
+      if (navigator.clipboard && window.ClipboardItem && typeof navigator.clipboard.write === 'function') {
+        var item = null;
+        try {
+          item = new ClipboardItem({
+            'text/html': new Blob([toPasteHtml(html)], { type: 'text/html' }),
+            'text/plain': new Blob([html], { type: 'text/plain' }),
+          });
+        } catch (e) { item = null; }
+        if (item) {
+          navigator.clipboard.write([item]).then(function () { done(true); }, function () { done(copyHtmlFallback(html)); });
+          return;
+        }
+      }
+      done(copyHtmlFallback(html));
+    });
+
+    return { state: state, inputs: inputs, render: render };
   }
 
-  function scheduleRenderHttt() {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(renderHttt, DEBOUNCE_MS);
-  }
-
-  inputsHttt.linhVuc.addEventListener('input', function () { httt.linhVuc = inputsHttt.linhVuc.value; scheduleRenderHttt(); });
-  inputsHttt.nntTen.addEventListener('input', function () { httt.nntTen = inputsHttt.nntTen.value; scheduleRenderHttt(); });
-  inputsHttt.hoTen.addEventListener('input', function () { httt.hoTen = inputsHttt.hoTen.value; scheduleRenderHttt(); });
-
-  document.querySelectorAll('input[name="xungHo2"]').forEach(function (radio) {
-    radio.addEventListener('change', function () {
-      if (radio.checked) { httt.xungHo = radio.value; renderHttt(); }
-    });
+  var htttFlow = makeHtttFlow({
+    type: 'httt',
+    state: htttState,
+    inputs: { quanLy: '#f2-quanLy', nntTen: '#f2-nntTen', hoTen: '#f2-hoTen' },
+    radios: [
+      { name: 'xungHo2', key: 'xungHoQL' },
+      { name: 'xungHo2NS', key: 'xungHoNS' },
+      { name: 'tuGoi2', key: 'tuGoi' },
+    ],
+    preview: '#preview-httt',
+    btnDownload: '#btn-download-httt',
+    btnCopy: '#btn-copy-httt',
+    blockReason: '#block-reason-httt',
+    errAttr: 'data-err2',
   });
 
-  document.querySelectorAll('input[name="tuGoi2"]').forEach(function (radio) {
-    radio.addEventListener('change', function () {
-      if (radio.checked) { httt.tuGoi = radio.value; renderHttt(); }
-    });
+  var htttNsFlow = makeHtttFlow({
+    type: 'httt-ns',
+    state: htttNsState,
+    inputs: { nntTen: '#f3-nntTen', hoTen: '#f3-hoTen' },
+    radios: [
+      { name: 'xungHo3', key: 'xungHoNS' },
+      { name: 'tuGoi3', key: 'tuGoi' },
+    ],
+    preview: '#preview-httt-ns',
+    btnDownload: '#btn-download-httt-ns',
+    btnCopy: '#btn-copy-httt-ns',
+    blockReason: '#block-reason-httt-ns',
+    errAttr: 'data-err3',
   });
 
   // ---- Tab chủ đề email (FR-7): dùng chung Lĩnh vực + Nghệ danh của form Thư mời ----
@@ -399,51 +475,12 @@
     window.open(blobUrl, '_blank');
   });
 
-  // ---- Tải về / Sao chép cho tab HTTT ----
-  btnDownloadHttt.addEventListener('click', function () {
-    if (!lastValidHtmlHttt) return;
-    trackEvent('tai-httt');
-    var blob = new Blob([lastValidHtmlHttt], { type: 'text/html;charset=utf-8' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'SH27-httt-' + (F.slugify(httt.nntTen) || 'nnt') + '.html';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-    saveSender({ hoTen: httt.hoTen });
-  });
-
-  btnCopyHttt.addEventListener('click', function () {
-    if (!lastValidHtmlHttt) return;
-    trackEvent('copy-httt');
-    var html = lastValidHtmlHttt;
-    function done(ok) {
-      showToast(ok ? 'Đã sao chép — dán trực tiếp vào Gmail' : 'Không sao chép được — hãy dùng nút Tải file HTML');
-      if (ok) saveSender({ hoTen: httt.hoTen });
-    }
-    if (navigator.clipboard && window.ClipboardItem && typeof navigator.clipboard.write === 'function') {
-      var item = null;
-      try {
-        item = new ClipboardItem({
-          'text/html': new Blob([toPasteHtml(html)], { type: 'text/html' }),
-          'text/plain': new Blob([html], { type: 'text/plain' }),
-        });
-      } catch (e) { item = null; }
-      if (item) {
-        navigator.clipboard.write([item]).then(function () { done(true); }, function () { done(copyHtmlFallback(html)); });
-        return;
-      }
-    }
-    done(copyHtmlFallback(html));
-  });
-
   // ---- Khởi động ----
   loadSender();
   renderSubjects();
   var firstSeg = typeGroup.querySelector('.seg[data-type="kmdh"]');
   if (firstSeg) firstSeg.setAttribute('aria-pressed', 'true');
   render();
-  renderHttt();
+  htttFlow.render();
+  htttNsFlow.render();
 })();

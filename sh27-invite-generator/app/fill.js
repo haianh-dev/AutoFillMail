@@ -8,20 +8,23 @@
 
   // Regex gộp single-pass (docs/03 §3): P5 gồm cả dấu chấm đi kèm (\.?); P2 chấp nhận &nbsp;, khoảng trắng hoặc không gì giữa "/" và "tên KOLs"
   var PLACEHOLDER_RE =
-    /\[Lĩnh vực\]|\[Nghệ danh\/(?:&nbsp;|\s)?tên KOLs\]|\[Anh\/Chị\]|\[Tên NNT\]|\[đệm \+ tên\]|\[Họ và tên\]\.?|\.\.\.\/\.\.\.\/2026/g;
+    /\[Lĩnh vực\]|\[Nghệ danh\/(?:&nbsp;|\s)?tên KOLs\]|\[Anh\/Chị\]|\[Quản lý\]|\[XH QL\]|\[XH NS\]|\[Tên NS\]|\[đệm \+ tên\]|\[Họ và tên\]\.?|\.\.\.\/\.\.\.\/2026/g;
 
   var KEY_BY_PREFIX = [
     ['[Lĩnh', 'linhVuc'],
     ['[Nghệ', 'ngheDanh'],
     ['[Anh/Chị]', 'xungHo'],
-    ['[Tên', 'nntTen'],
+    ['[Quản lý]', 'quanLy'],
+    ['[XH QL]', 'xungHoQL'],
+    ['[XH NS]', 'xungHoNS'],
+    ['[Tên NS]', 'nntTen'],
     ['[đệm', 'demTen'],
     ['[Họ', 'hoTen'],
     ['...', 'ngay'],
   ];
 
   // Pattern kiểm tra placeholder còn sót (docs/03 §3)
-  var LEFTOVER_BRACKET_RE = /\[(?:Lĩnh vực|Nghệ danh|Anh\/Chị|Tên NNT|đệm|Họ và tên)[^\]]*\]/;
+  var LEFTOVER_BRACKET_RE = /\[(?:Lĩnh vực|Nghệ danh|Anh\/Chị|Quản lý|XH QL|XH NS|Tên NS|đệm|Họ và tên)[^\]]*\]/;
   var LEFTOVER_DATE_RE = /\.\.\.\/\.\.\.\/2026/;
 
   // docs/03 §4.2: ngay trước token (bỏ qua khoảng trắng, &nbsp;, thẻ strong/em/span/b/i)
@@ -75,12 +78,14 @@
     hoTen: 'họ và tên của bạn',
     demTen: 'đệm + tên của bạn',
     ngay: 'ngày hồi âm',
-    nntTen: 'tên người nổi tiếng / quản lý',
+    nntTen: 'tên nghệ sĩ / người nổi tiếng',
+    quanLy: 'tên người quản lý',
   };
 
-  // Thư HTTT không có [đệm + tên], [ngày], [Nghệ danh] — đổi bằng [Tên NNT]
+  // Thư HTTT không có [đệm + tên], [ngày], [Nghệ danh] — cần chỗ khác tùy bản thư
   var REQUIRED_BY_TYPE = {
-    httt: ['linhVuc', 'nntTen', 'hoTen'],
+    httt: ['quanLy', 'nntTen', 'hoTen'],
+    'httt-ns': ['nntTen', 'hoTen'],
   };
 
   function validate(values) {
@@ -145,6 +150,7 @@
     var val = {
       linhVuc: escapeHtml(normalizeText(v.linhVuc)),
       ngheDanh: escapeHtml(normalizeText(v.ngheDanh)),
+      quanLy: escapeHtml(normalizeText(v.quanLy)),
       nntTen: escapeHtml(normalizeText(v.nntTen)),
       demTen: escapeHtml(normalizeText(v.demTen)),
       hoTen: escapeHtml(normalizeText(v.hoTen)),
@@ -155,6 +161,8 @@
         // Yêu cầu mới của sếp: viết hoa "Anh"/"Chị" ở MỌI vị trí (không còn case thường)
         return capFirst(xung);
       }
+      if (key === 'xungHoQL') return XUNG_HO_BY_VALUE[v.xungHoQL] || 'Anh';
+      if (key === 'xungHoNS') return XUNG_HO_BY_VALUE[v.xungHoNS] || 'Anh';
       return val[key];
     });
   }

@@ -20,6 +20,7 @@
   <button type="button" class="tab" data-tab="invite" aria-selected="true">Thư mời</button>
   <button type="button" class="tab" data-tab="subject" aria-selected="false">Chủ đề email</button>
   <button type="button" class="tab" data-tab="httt" aria-selected="false">Mail trả lời khi bị từ chối &amp; ngỏ lời HTTT</button>
+  <button type="button" class="tab" data-tab="httt-ns" aria-selected="false">Mail HTTT gửi thẳng nghệ sĩ</button>
 </nav>
 
 <main class="layout" id="tab-invite">
@@ -116,20 +117,20 @@
 <main class="layout" id="tab-httt" hidden>
   <section class="panel form-panel">
     <div class="field">
-      <label class="label" for="f2-linhVuc">Lĩnh vực <em>*</em></label>
-      <input id="f2-linhVuc" type="text" maxlength="80" placeholder="Ví dụ: Ca sĩ, Diễn viên, MC">
-      <p class="err" data-err2="linhVuc"></p>
+      <label class="label" for="f2-quanLy">Người quản lý <em>*</em></label>
+      <input id="f2-quanLy" type="text" maxlength="120" placeholder="Ví dụ: Quản lý ca sĩ Osad">
+      <p class="hint">Cả cụm gọi người quản lý, thay vào chỗ in đậm "Quản lý …" đầu thư.</p>
+      <p class="err" data-err2="quanLy"></p>
     </div>
 
     <div class="field">
-      <label class="label" for="f2-nntTen">Tên người nổi tiếng / Quản lý <em>*</em></label>
-      <input id="f2-nntTen" type="text" maxlength="80" placeholder="Ví dụ: OSAD">
-      <p class="hint">Điền vào các chỗ in đậm "Quản lý …" và tên NNT trong thư.</p>
+      <label class="label" for="f2-nntTen">Tên nghệ sĩ / Người nổi tiếng <em>*</em></label>
+      <input id="f2-nntTen" type="text" maxlength="80" placeholder="Ví dụ: Osad">
       <p class="err" data-err2="nntTen"></p>
     </div>
 
     <div class="field">
-      <span class="label">Xưng hô <em>*</em></span>
+      <span class="label">Xưng hô với quản lý <em>*</em></span>
       <div class="radio-row">
         <label><input type="radio" name="xungHo2" value="anh" checked> Anh</label>
         <label><input type="radio" name="xungHo2" value="chị"> Chị</label>
@@ -138,6 +139,20 @@
         <label><input type="radio" name="xungHo2" value="anh chị"> Anh Chị</label>
         <label><input type="radio" name="xungHo2" value="band"> Band</label>
       </div>
+      <p class="hint">Dùng cho các chỗ xưng hô riêng lẻ (đến <strong>Anh</strong> đã dành…, đón tiếp…).</p>
+    </div>
+
+    <div class="field">
+      <span class="label">Xưng hô với nghệ sĩ <em>*</em></span>
+      <div class="radio-row">
+        <label><input type="radio" name="xungHo2NS" value="anh" checked> Anh</label>
+        <label><input type="radio" name="xungHo2NS" value="chị"> Chị</label>
+        <label><input type="radio" name="xungHo2NS" value="cô"> Cô</label>
+        <label><input type="radio" name="xungHo2NS" value="chú"> Chú</label>
+        <label><input type="radio" name="xungHo2NS" value="anh chị"> Anh Chị</label>
+        <label><input type="radio" name="xungHo2NS" value="band"> Band</label>
+      </div>
+      <p class="hint">Dùng cho các chỗ kèm tên nghệ sĩ (…và <strong>Anh Osad</strong>).</p>
     </div>
 
     <div class="field">
@@ -170,6 +185,59 @@
       <h2>Xem trước</h2>
     </div>
     <iframe id="preview-httt" class="preview-frame" sandbox="allow-popups allow-popups-to-escape-sandbox" title="Xem trước thư HTTT"></iframe>
+  </section>
+</main>
+
+<main class="layout" id="tab-httt-ns" hidden>
+  <section class="panel form-panel">
+    <div class="field">
+      <label class="label" for="f3-nntTen">Tên nghệ sĩ / Người nổi tiếng <em>*</em></label>
+      <input id="f3-nntTen" type="text" maxlength="80" placeholder="Ví dụ: Osad">
+      <p class="err" data-err3="nntTen"></p>
+    </div>
+
+    <div class="field">
+      <span class="label">Xưng hô với nghệ sĩ <em>*</em></span>
+      <div class="radio-row">
+        <label><input type="radio" name="xungHo3" value="anh" checked> Anh</label>
+        <label><input type="radio" name="xungHo3" value="chị"> Chị</label>
+        <label><input type="radio" name="xungHo3" value="cô"> Cô</label>
+        <label><input type="radio" name="xungHo3" value="chú"> Chú</label>
+        <label><input type="radio" name="xungHo3" value="anh chị"> Anh Chị</label>
+        <label><input type="radio" name="xungHo3" value="band"> Band</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="label">Tự xưng là <em>*</em></span>
+      <div class="radio-row">
+        <label><input type="radio" name="tuGoi3" value="em" checked> Em</label>
+        <label><input type="radio" name="tuGoi3" value="con"> Con</label>
+        <label><input type="radio" name="tuGoi3" value="cháu"> Cháu</label>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <p class="section-title">Người gửi</p>
+
+    <div class="field">
+      <label class="label" for="f3-hoTen">Họ và tên của bạn <em>*</em></label>
+      <input id="f3-hoTen" type="text" maxlength="80" placeholder="Ví dụ: Nguyễn Hải Anh">
+      <p class="err" data-err3="hoTen"></p>
+    </div>
+
+    <div class="actions">
+      <button id="btn-download-httt-ns" type="button" class="btn primary" disabled>Tải file HTML</button>
+      <button id="btn-copy-httt-ns" type="button" class="btn" disabled>Sao chép HTML (dán vào Gmail)</button>
+      <p class="hint" id="block-reason-httt-ns"></p>
+    </div>
+  </section>
+
+  <section class="panel preview-panel">
+    <div class="preview-head">
+      <h2>Xem trước</h2>
+    </div>
+    <iframe id="preview-httt-ns" class="preview-frame" sandbox="allow-popups allow-popups-to-escape-sandbox" title="Xem trước thư HTTT gửi thẳng nghệ sĩ"></iframe>
   </section>
 </main>
 
