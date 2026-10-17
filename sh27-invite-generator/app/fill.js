@@ -8,19 +8,20 @@
 
   // Regex gộp single-pass (docs/03 §3): P5 gồm cả dấu chấm đi kèm (\.?); P2 chấp nhận &nbsp;, khoảng trắng hoặc không gì giữa "/" và "tên KOLs"
   var PLACEHOLDER_RE =
-    /\[Lĩnh vực\]|\[Nghệ danh\/(?:&nbsp;|\s)?tên KOLs\]|\[Anh\/Chị\]|\[đệm \+ tên\]|\[Họ và tên\]\.?|\.\.\.\/\.\.\.\/2026/g;
+    /\[Lĩnh vực\]|\[Nghệ danh\/(?:&nbsp;|\s)?tên KOLs\]|\[Anh\/Chị\]|\[Tên NNT\]|\[đệm \+ tên\]|\[Họ và tên\]\.?|\.\.\.\/\.\.\.\/2026/g;
 
   var KEY_BY_PREFIX = [
     ['[Lĩnh', 'linhVuc'],
     ['[Nghệ', 'ngheDanh'],
     ['[Anh/Chị]', 'xungHo'],
+    ['[Tên', 'nntTen'],
     ['[đệm', 'demTen'],
     ['[Họ', 'hoTen'],
     ['...', 'ngay'],
   ];
 
   // Pattern kiểm tra placeholder còn sót (docs/03 §3)
-  var LEFTOVER_BRACKET_RE = /\[(?:Lĩnh vực|Nghệ danh|Anh\/Chị|đệm|Họ và tên)[^\]]*\]/;
+  var LEFTOVER_BRACKET_RE = /\[(?:Lĩnh vực|Nghệ danh|Anh\/Chị|Tên NNT|đệm|Họ và tên)[^\]]*\]/;
   var LEFTOVER_DATE_RE = /\.\.\.\/\.\.\.\/2026/;
 
   // docs/03 §4.2: ngay trước token (bỏ qua khoảng trắng, &nbsp;, thẻ strong/em/span/b/i)
@@ -74,14 +75,24 @@
     hoTen: 'họ và tên của bạn',
     demTen: 'đệm + tên của bạn',
     ngay: 'ngày hồi âm',
+    nntTen: 'tên người nổi tiếng / quản lý',
+  };
+
+  // Thư HTTT không có [đệm + tên], [ngày], [Nghệ danh] — đổi bằng [Tên NNT]
+  var REQUIRED_BY_TYPE = {
+    httt: ['linhVuc', 'nntTen', 'hoTen'],
   };
 
   function validate(values) {
+    var v = values || {};
     var errors = {};
-    ['linhVuc', 'ngheDanh', 'hoTen', 'demTen', 'ngay'].forEach(function (k) {
-      if (!normalizeText(values[k])) errors[k] = 'Vui lòng nhập ' + LABELS[k] + '.';
+    var req = REQUIRED_BY_TYPE[v.type] || ['linhVuc', 'ngheDanh', 'hoTen', 'demTen', 'ngay'];
+    req.forEach(function (k) {
+      if (!normalizeText(v[k])) errors[k] = 'Vui lòng nhập ' + LABELS[k] + '.';
     });
-    if (!values.ngay || !formatDate(values.ngay)) errors.ngay = 'Vui lòng chọn ngày hồi âm.';
+    if (req.indexOf('ngay') !== -1 && (!v.ngay || !formatDate(v.ngay))) {
+      errors.ngay = 'Vui lòng chọn ngày hồi âm.';
+    }
     return { ok: Object.keys(errors).length === 0, errors: errors };
   }
 
@@ -134,6 +145,7 @@
     var val = {
       linhVuc: escapeHtml(normalizeText(v.linhVuc)),
       ngheDanh: escapeHtml(normalizeText(v.ngheDanh)),
+      nntTen: escapeHtml(normalizeText(v.nntTen)),
       demTen: escapeHtml(normalizeText(v.demTen)),
       hoTen: escapeHtml(normalizeText(v.hoTen)),
       ngay: formatDate(v.ngay),

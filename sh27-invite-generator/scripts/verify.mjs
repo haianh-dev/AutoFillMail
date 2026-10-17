@@ -148,6 +148,58 @@ for (const name of Object.keys(TPL)) {
 }
 
 // ---- D. Khác biệt 3 template ----
+// ---- D2. Thư HTTT (mail trả lời khi bị từ chối & ngỏ lời hỗ trợ truyền thông) ----
+const HTTT = readFileSync(join(root, 'templates', 'httt.html'), 'utf8');
+const HTTT_BASE = {
+  type: 'httt', linhVuc: 'nghệ sĩ', nntTen: 'OSAD', xungHo: 'anh', tuGoi: 'em',
+  hoTen: 'Nguyễn Hải Anh',
+};
+const outH = fill.fill(HTTT, HTTT_BASE);
+test('T-H1 httt', 'Thân gửi đúng chỗ in đậm', () => {
+  assert.ok(outH.includes('Thân gửi <strong>Quản lý nghệ sĩ OSAD</strong> và <strong>Anh OSAD</strong>,'));
+});
+test('T-H2 httt', 'xưng hô viết hoa mọi vị trí', () => {
+  assert.ok(outH.includes('đến <strong>Anh</strong> đã dành thời gian'));
+  assert.ok(outH.includes('đón tiếp Anh tại ngày hội'));
+  assert.ok(!/(?<![\wÀ-ỹ])anh(?![\wÀ-ỹ])/.test(outH.replace(/<[^>]*>/g, '')), 'còn "anh" thường');
+});
+test('T-H3 httt', 'tên NNT điền đủ các chỗ in đậm', () => {
+  assert.strictEqual(countMatches(outH, /<strong>Anh OSAD<\/strong>/g), 3);
+  assert.strictEqual(countMatches(outH, /<strong>Anh và Anh OSAD<\/strong>/g), 3);
+  assert.ok(outH.includes('của <strong>Anh OSAD</strong> và rất tiếc'));
+});
+test('T-H4 httt', 'tự xưng em giữ nguyên + chữ ký', () => {
+  assert.ok(outH.includes('em xin gửi lời cảm ơn'));
+  assert.ok(outH.includes('Chúng em hoàn toàn thấu hiểu'));
+  assert.ok(outH.includes('Em xin cảm ơn'));
+  assert.ok(outH.includes('<em>Nguyễn Hải Anh</em>'));
+  assert.deepStrictEqual(fill.findLeftovers(outH), []);
+});
+test('T-H5 httt', 'tự xưng con thay đúng hoa/thường', () => {
+  const out2 = fill.fill(HTTT, { ...HTTT_BASE, tuGoi: 'con' });
+  assert.ok(out2.includes('con xin gửi lời cảm ơn'));
+  assert.ok(out2.includes('Chúng con hoàn toàn thấu hiểu'));
+  assert.ok(out2.includes('Con xin cảm ơn'));
+  assert.ok(!/(?<![\wÀ-ỹ])[Ee]m(?![\wÀ-ỹ])/.test(out2.replace(/<[^>]*>/g, '')), 'còn sót em/Em ngoài thẻ');
+});
+test('T-H6 httt', 'xưng hô chị + giữ thẻ <em> chữ ký', () => {
+  const out2 = fill.fill(HTTT, { ...HTTT_BASE, xungHo: 'chị' });
+  assert.ok(out2.includes('đến <strong>Chị</strong> đã dành'));
+  assert.ok(out2.includes('<strong>Chị OSAD</strong>'));
+  assert.ok(out2.includes('<em>Nguyễn Hải Anh</em>'));
+});
+test('T-H7 httt', 'validate httt: cần linhVuc+nntTen+hoTen, không cần demTen/ngay', () => {
+  const r1 = fill.validate({ type: 'httt', linhVuc: 'a', hoTen: 'b' });
+  assert.ok(!r1.ok && r1.errors.nntTen && !r1.errors.demTen && !r1.errors.ngay);
+  const r2 = fill.validate({ type: 'httt', linhVuc: 'a', nntTen: 'c', hoTen: 'b' });
+  assert.ok(r2.ok);
+});
+test('T-H8 httt', 'validate kmdh không đổi: vẫn cần demTen+ngay', () => {
+  const r = fill.validate({ type: 'kmdh', linhVuc: 'a', ngheDanh: 'b', hoTen: 'c' });
+  assert.ok(!r.ok && r.errors.demTen && r.errors.ngay && !r.errors.nntTen);
+});
+
+// ---- D. Khác biệt 3 template (bản gốc) ----
 const ROLE = {
   kmdh: 'KHÁCH MỜI ĐỒNG HÀNH',
   nvtch: 'NHÂN VẬT TRUYỀN CẢM HỨNG',

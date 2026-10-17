@@ -5,7 +5,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const names = ['kmdh', 'nvtch', 'dsnh'];
+const names = ['kmdh', 'nvtch', 'dsnh', 'httt'];
 
 const out = {};
 for (const name of names) {

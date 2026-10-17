@@ -19,6 +19,7 @@
 <nav class="tabs" aria-label="Chức năng">
   <button type="button" class="tab" data-tab="invite" aria-selected="true">Thư mời</button>
   <button type="button" class="tab" data-tab="subject" aria-selected="false">Chủ đề email</button>
+  <button type="button" class="tab" data-tab="httt" aria-selected="false">Mail trả lời khi bị từ chối &amp; ngỏ lời HTTT</button>
 </nav>
 
 <main class="layout" id="tab-invite">
@@ -109,6 +110,66 @@
       <button id="btn-open-tab" type="button" class="btn small">Mở tab mới</button>
     </div>
     <iframe id="preview" class="preview-frame" sandbox="allow-popups allow-popups-to-escape-sandbox" title="Xem trước thư mời"></iframe>
+  </section>
+</main>
+
+<main class="layout" id="tab-httt" hidden>
+  <section class="panel form-panel">
+    <div class="field">
+      <label class="label" for="f2-linhVuc">Lĩnh vực <em>*</em></label>
+      <input id="f2-linhVuc" type="text" maxlength="80" placeholder="Ví dụ: Ca sĩ, Diễn viên, MC">
+      <p class="err" data-err2="linhVuc"></p>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f2-nntTen">Tên người nổi tiếng / Quản lý <em>*</em></label>
+      <input id="f2-nntTen" type="text" maxlength="80" placeholder="Ví dụ: OSAD">
+      <p class="hint">Điền vào các chỗ in đậm "Quản lý …" và tên NNT trong thư.</p>
+      <p class="err" data-err2="nntTen"></p>
+    </div>
+
+    <div class="field">
+      <span class="label">Xưng hô <em>*</em></span>
+      <div class="radio-row">
+        <label><input type="radio" name="xungHo2" value="anh" checked> Anh</label>
+        <label><input type="radio" name="xungHo2" value="chị"> Chị</label>
+        <label><input type="radio" name="xungHo2" value="cô"> Cô</label>
+        <label><input type="radio" name="xungHo2" value="chú"> Chú</label>
+        <label><input type="radio" name="xungHo2" value="anh chị"> Anh Chị</label>
+        <label><input type="radio" name="xungHo2" value="band"> Band</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="label">Tự xưng là <em>*</em></span>
+      <div class="radio-row">
+        <label><input type="radio" name="tuGoi2" value="em" checked> Em</label>
+        <label><input type="radio" name="tuGoi2" value="con"> Con</label>
+        <label><input type="radio" name="tuGoi2" value="cháu"> Cháu</label>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <p class="section-title">Người gửi</p>
+
+    <div class="field">
+      <label class="label" for="f2-hoTen">Họ và tên của bạn <em>*</em></label>
+      <input id="f2-hoTen" type="text" maxlength="80" placeholder="Ví dụ: Nguyễn Hải Anh">
+      <p class="err" data-err2="hoTen"></p>
+    </div>
+
+    <div class="actions">
+      <button id="btn-download-httt" type="button" class="btn primary" disabled>Tải file HTML</button>
+      <button id="btn-copy-httt" type="button" class="btn" disabled>Sao chép HTML (dán vào Gmail)</button>
+      <p class="hint" id="block-reason-httt"></p>
+    </div>
+  </section>
+
+  <section class="panel preview-panel">
+    <div class="preview-head">
+      <h2>Xem trước</h2>
+    </div>
+    <iframe id="preview-httt" class="preview-frame" sandbox="allow-popups allow-popups-to-escape-sandbox" title="Xem trước thư HTTT"></iframe>
   </section>
 </main>
 

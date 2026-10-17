@@ -28,6 +28,19 @@
   var lastValidHtml = null;
   var blobUrl = null;
 
+  // ---- Trạng thái tab HTTT (mail trả lời khi bị từ chối & ngỏ lời hỗ trợ truyền thông) ----
+  var httt = { linhVuc: '', nntTen: '', xungHo: 'anh', tuGoi: 'em', hoTen: '' };
+  var inputsHttt = {
+    linhVuc: $('#f2-linhVuc'),
+    nntTen: $('#f2-nntTen'),
+    hoTen: $('#f2-hoTen'),
+  };
+  var previewHttt = $('#preview-httt');
+  var btnDownloadHttt = $('#btn-download-httt');
+  var btnCopyHttt = $('#btn-copy-httt');
+  var blockReasonHttt = $('#block-reason-httt');
+  var lastValidHtmlHttt = null;
+
   // ---- Phần tử DOM ----
   var $ = function (sel) { return document.querySelector(sel); };
   var inputs = {
@@ -45,26 +58,34 @@
   var toast = $('#toast');
   var blockReason = $('#block-reason');
 
-  // ---- localStorage (FR-6) ----
+  // ---- localStorage (FR-6) — gộp để 2 tab cùng dùng, không ghi đè nhau ----
+  function saveSender(patch) {
+    try {
+      var saved = {};
+      try { saved = JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch (e2) { saved = {}; }
+      if (patch) {
+        for (var k in patch) saved[k] = patch[k];
+      } else {
+        saved.hoTen = values.hoTen;
+        saved.demTen = values.demTen;
+        saved.ngay = values.ngay;
+      }
+      localStorage.setItem(LS_KEY, JSON.stringify(saved));
+    } catch (e) { /* bỏ qua */ }
+  }
+
   function loadSender() {
     try {
       var raw = localStorage.getItem(LS_KEY);
       if (!raw) return;
       var saved = JSON.parse(raw);
-      if (saved.hoTen) { values.hoTen = saved.hoTen; inputs.hoTen.value = saved.hoTen; }
+      if (saved.hoTen) {
+        values.hoTen = saved.hoTen; inputs.hoTen.value = saved.hoTen;
+        httt.hoTen = saved.hoTen; inputsHttt.hoTen.value = saved.hoTen;
+      }
       if (saved.demTen) { values.demTen = saved.demTen; inputs.demTen.value = saved.demTen; demTenTouched = true; }
       if (saved.ngay) { values.ngay = saved.ngay; inputs.ngay.value = saved.ngay; }
     } catch (e) { /* localStorage có thể bị chặn — bỏ qua */ }
-  }
-
-  function saveSender() {
-    try {
-      localStorage.setItem(LS_KEY, JSON.stringify({
-        hoTen: values.hoTen,
-        demTen: values.demTen,
-        ngay: values.ngay,
-      }));
-    } catch (e) { /* bỏ qua */ }
   }
 
   // ---- Render ----
@@ -158,6 +179,58 @@
       });
       document.getElementById('tab-invite').hidden = tab.dataset.tab !== 'invite';
       document.getElementById('tab-subject').hidden = tab.dataset.tab !== 'subject';
+      document.getElementById('tab-httt').hidden = tab.dataset.tab !== 'httt';
+    });
+  });
+
+  // ---- Tab Mail HTTT: mẫu thư trả lời khi bị từ chối & ngỏ lời hỗ trợ truyền thông ----
+  function renderHttt() {
+    var html = F.fill(window.SH27_TEMPLATES.httt, httt);
+    previewHttt.srcdoc = html;
+
+    var v = F.validate(Object.assign({ type: 'httt' }, httt));
+    var leftovers = F.findLeftovers(html);
+    var canExport = v.ok && leftovers.length === 0;
+
+    btnDownloadHttt.disabled = !canExport;
+    btnCopyHttt.disabled = !canExport;
+    lastValidHtmlHttt = canExport ? html : null;
+
+    if (canExport) {
+      blockReasonHttt.textContent = '';
+    } else {
+      var missing = Object.keys(v.errors).length > 0;
+      blockReasonHttt.textContent = leftovers.length > 0
+        ? 'Còn sót placeholder (dữ liệu nhập chứa ký tự giống placeholder) — không thể tải.'
+        : (missing ? 'Vui lòng điền đủ các ô bắt buộc để tải hoặc sao chép.' : '');
+    }
+
+    ['linhVuc', 'nntTen', 'hoTen'].forEach(function (key) {
+      var errEl = document.querySelector('[data-err2="' + key + '"]');
+      var msg = v.errors[key] || '';
+      if (errEl) errEl.textContent = msg;
+      if (inputsHttt[key]) inputsHttt[key].classList.toggle('invalid', !!msg);
+    });
+  }
+
+  function scheduleRenderHttt() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(renderHttt, DEBOUNCE_MS);
+  }
+
+  inputsHttt.linhVuc.addEventListener('input', function () { httt.linhVuc = inputsHttt.linhVuc.value; scheduleRenderHttt(); });
+  inputsHttt.nntTen.addEventListener('input', function () { httt.nntTen = inputsHttt.nntTen.value; scheduleRenderHttt(); });
+  inputsHttt.hoTen.addEventListener('input', function () { httt.hoTen = inputsHttt.hoTen.value; scheduleRenderHttt(); });
+
+  document.querySelectorAll('input[name="xungHo2"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      if (radio.checked) { httt.xungHo = radio.value; renderHttt(); }
+    });
+  });
+
+  document.querySelectorAll('input[name="tuGoi2"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      if (radio.checked) { httt.tuGoi = radio.value; renderHttt(); }
     });
   });
 
@@ -326,10 +399,51 @@
     window.open(blobUrl, '_blank');
   });
 
+  // ---- Tải về / Sao chép cho tab HTTT ----
+  btnDownloadHttt.addEventListener('click', function () {
+    if (!lastValidHtmlHttt) return;
+    trackEvent('tai-httt');
+    var blob = new Blob([lastValidHtmlHttt], { type: 'text/html;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'SH27-httt-' + (F.slugify(httt.nntTen) || 'nnt') + '.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    saveSender({ hoTen: httt.hoTen });
+  });
+
+  btnCopyHttt.addEventListener('click', function () {
+    if (!lastValidHtmlHttt) return;
+    trackEvent('copy-httt');
+    var html = lastValidHtmlHttt;
+    function done(ok) {
+      showToast(ok ? 'Đã sao chép — dán trực tiếp vào Gmail' : 'Không sao chép được — hãy dùng nút Tải file HTML');
+      if (ok) saveSender({ hoTen: httt.hoTen });
+    }
+    if (navigator.clipboard && window.ClipboardItem && typeof navigator.clipboard.write === 'function') {
+      var item = null;
+      try {
+        item = new ClipboardItem({
+          'text/html': new Blob([toPasteHtml(html)], { type: 'text/html' }),
+          'text/plain': new Blob([html], { type: 'text/plain' }),
+        });
+      } catch (e) { item = null; }
+      if (item) {
+        navigator.clipboard.write([item]).then(function () { done(true); }, function () { done(copyHtmlFallback(html)); });
+        return;
+      }
+    }
+    done(copyHtmlFallback(html));
+  });
+
   // ---- Khởi động ----
   loadSender();
   renderSubjects();
   var firstSeg = typeGroup.querySelector('.seg[data-type="kmdh"]');
   if (firstSeg) firstSeg.setAttribute('aria-pressed', 'true');
   render();
+  renderHttt();
 })();
