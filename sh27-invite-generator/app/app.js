@@ -133,7 +133,37 @@
     render();
   });
 
-  inputs.linhVuc.addEventListener('input', function () { values.linhVuc = inputs.linhVuc.value; scheduleRender(); });
+  var linhVucChips = $('#linhVuc-chips');
+  function updateChipsState() {
+    if (!linhVucChips) return;
+    var current = (values.linhVuc || '').trim().toLowerCase();
+    Array.prototype.forEach.call(linhVucChips.querySelectorAll('.chip'), function (chip) {
+      chip.classList.toggle('active', chip.dataset.val.toLowerCase() === current);
+    });
+  }
+
+  if (linhVucChips) {
+    linhVucChips.addEventListener('click', function (e) {
+      var chip = e.target.closest('.chip');
+      if (!chip) return;
+      var val = chip.dataset.val;
+      if (values.linhVuc === val) {
+        values.linhVuc = '';
+        inputs.linhVuc.value = '';
+      } else {
+        values.linhVuc = val;
+        inputs.linhVuc.value = val;
+      }
+      updateChipsState();
+      scheduleRender();
+    });
+  }
+
+  inputs.linhVuc.addEventListener('input', function () {
+    values.linhVuc = inputs.linhVuc.value;
+    updateChipsState();
+    scheduleRender();
+  });
   inputs.ngheDanh.addEventListener('input', function () { values.ngheDanh = inputs.ngheDanh.value; scheduleRender(); });
 
   inputs.hoTen.addEventListener('input', function () {

@@ -45,7 +45,55 @@
 
     <div class="field">
       <label class="label" for="f-linhVuc">Lĩnh vực <em>*</em></label>
-      <input id="f-linhVuc" type="text" maxlength="80" placeholder="Ví dụ: Ca sĩ, Diễn viên, MC">
+      <input id="f-linhVuc" type="text" maxlength="80" placeholder="Ví dụ: Ca sĩ, Diễn viên, MC" list="linhVuc-list" autocomplete="off">
+      <datalist id="linhVuc-list">
+        <option value="Ca sĩ"></option>
+        <option value="Diễn viên"></option>
+        <option value="Vận Động Viên"></option>
+        <option value="MC"></option>
+        <option value="Content Creator"></option>
+        <option value="Diễn giả"></option>
+        <option value="Cầu thủ"></option>
+        <option value="Rapper"></option>
+        <option value="Nhà sản xuất âm nhạc"></option>
+        <option value="Nghệ sĩ"></option>
+        <option value="Nhà báo"></option>
+        <option value="NSND"></option>
+        <option value="NSUT"></option>
+        <option value="Hoa hậu"></option>
+        <option value="Biên tập viên"></option>
+        <option value="Đạo diễn"></option>
+        <option value="Nhóm nhạc"></option>
+        <option value="Ban nhạc"></option>
+        <option value="Người mẫu"></option>
+        <option value="Nam vương"></option>
+        <option value="Doanh nhân"></option>
+        <option value="Producer"></option>
+      </datalist>
+      <div class="field-chips" id="linhVuc-chips" aria-label="Gợi ý chọn nhanh lĩnh vực">
+        <button type="button" class="chip" data-val="Ca sĩ">Ca sĩ</button>
+        <button type="button" class="chip" data-val="Diễn viên">Diễn viên</button>
+        <button type="button" class="chip" data-val="Vận Động Viên">Vận Động Viên</button>
+        <button type="button" class="chip" data-val="MC">MC</button>
+        <button type="button" class="chip" data-val="Content Creator">Content Creator</button>
+        <button type="button" class="chip" data-val="Diễn giả">Diễn giả</button>
+        <button type="button" class="chip" data-val="Cầu thủ">Cầu thủ</button>
+        <button type="button" class="chip" data-val="Rapper">Rapper</button>
+        <button type="button" class="chip" data-val="Nhà sản xuất âm nhạc">Nhà sản xuất âm nhạc</button>
+        <button type="button" class="chip" data-val="Nghệ sĩ">Nghệ sĩ</button>
+        <button type="button" class="chip" data-val="Nhà báo">Nhà báo</button>
+        <button type="button" class="chip" data-val="NSND">NSND</button>
+        <button type="button" class="chip" data-val="NSUT">NSUT</button>
+        <button type="button" class="chip" data-val="Hoa hậu">Hoa hậu</button>
+        <button type="button" class="chip" data-val="Biên tập viên">Biên tập viên</button>
+        <button type="button" class="chip" data-val="Đạo diễn">Đạo diễn</button>
+        <button type="button" class="chip" data-val="Nhóm nhạc">Nhóm nhạc</button>
+        <button type="button" class="chip" data-val="Ban nhạc">Ban nhạc</button>
+        <button type="button" class="chip" data-val="Người mẫu">Người mẫu</button>
+        <button type="button" class="chip" data-val="Nam vương">Nam vương</button>
+        <button type="button" class="chip" data-val="Doanh nhân">Doanh nhân</button>
+        <button type="button" class="chip" data-val="Producer">Producer</button>
+      </div>
       <p class="err" data-err="linhVuc"></p>
     </div>
 
