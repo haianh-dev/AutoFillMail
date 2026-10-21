@@ -32,6 +32,8 @@
   var htttState = { quanLy: '', nntTen: '', xungHoQL: 'anh', xungHoNS: 'anh', tuGoi: 'em', hoTen: '' };
   var htttNsState = { nntTen: '', xungHoNS: 'anh', tuGoi: 'em', hoTen: '' };
   var camonState = { linhVuc: '', nntTen: '', xungHoNS: 'anh', tuGoi: 'em', hoTen: '' };
+  var nttState = { nhaTaiTro: '', demTen: '', ngay: '', hoTen: '' };
+  var btttState = { donViBttt: '', demTen: '', ngay: '', hoTen: '' };
 
   // ---- Phần tử DOM ----
   var $ = function (sel) { return document.querySelector(sel); };
@@ -73,14 +75,26 @@
       var saved = JSON.parse(raw);
       if (saved.hoTen) {
         values.hoTen = saved.hoTen; inputs.hoTen.value = saved.hoTen;
-        // seed cả 3 flow HTTT & Cảm ơn (được tạo sau nhưng loadSender luôn chạy sau cùng)
-        [htttFlow, htttNsFlow, camonFlow].forEach(function (flow) {
+        // seed cả 5 flow HTTT, HTTT-NS, Cảm ơn, NTT, BTTT (được tạo sau nhưng loadSender luôn chạy sau cùng)
+        [htttFlow, htttNsFlow, camonFlow, nttFlow, btttFlow].forEach(function (flow) {
           flow.state.hoTen = saved.hoTen;
           flow.inputs.hoTen.value = saved.hoTen;
         });
       }
-      if (saved.demTen) { values.demTen = saved.demTen; inputs.demTen.value = saved.demTen; demTenTouched = true; }
-      if (saved.ngay) { values.ngay = saved.ngay; inputs.ngay.value = saved.ngay; }
+      if (saved.demTen) {
+        values.demTen = saved.demTen; inputs.demTen.value = saved.demTen; demTenTouched = true;
+        // seed demTen cho NTT và BTTT
+        [nttFlow, btttFlow].forEach(function (flow) {
+          if (flow.inputs.demTen) { flow.state.demTen = saved.demTen; flow.inputs.demTen.value = saved.demTen; }
+        });
+      }
+      if (saved.ngay) {
+        values.ngay = saved.ngay; inputs.ngay.value = saved.ngay;
+        // seed ngay cho NTT và BTTT
+        [nttFlow, btttFlow].forEach(function (flow) {
+          if (flow.inputs.ngay) { flow.state.ngay = saved.ngay; flow.inputs.ngay.value = saved.ngay; }
+        });
+      }
     } catch (e) { /* localStorage có thể bị chặn — bỏ qua */ }
   }
 
@@ -208,6 +222,8 @@
       document.getElementById('tab-httt').hidden = tab.dataset.tab !== 'httt';
       document.getElementById('tab-httt-ns').hidden = tab.dataset.tab !== 'httt-ns';
       document.getElementById('tab-cam-on').hidden = tab.dataset.tab !== 'cam-on';
+      document.getElementById('tab-ntt').hidden = tab.dataset.tab !== 'ntt';
+      document.getElementById('tab-bttt').hidden = tab.dataset.tab !== 'bttt';
     });
   });
 
@@ -276,12 +292,15 @@
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url;
-      a.download = 'SH27-' + cfg.type + '-' + (F.slugify(state.nntTen) || 'nnt') + '.html';
+      a.download = 'SH27-' + cfg.type + '-' + (F.slugify(state.nntTen || state.nhaTaiTro || state.donViBttt || state.quanLy) || 'mail') + '.html';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-      saveSender({ hoTen: state.hoTen });
+      var patch = { hoTen: state.hoTen };
+      if (state.demTen) patch.demTen = state.demTen;
+      if (state.ngay) patch.ngay = state.ngay;
+      saveSender(patch);
     });
 
     btnCopy.addEventListener('click', function () {
@@ -290,7 +309,12 @@
       var html = lastValid;
       function done(ok) {
         showToast(ok ? 'Đã sao chép — dán trực tiếp vào Gmail' : 'Không sao chép được — hãy dùng nút Tải file HTML');
-        if (ok) saveSender({ hoTen: state.hoTen });
+        if (ok) {
+          var p = { hoTen: state.hoTen };
+          if (state.demTen) p.demTen = state.demTen;
+          if (state.ngay) p.ngay = state.ngay;
+          saveSender(p);
+        }
       }
       if (navigator.clipboard && window.ClipboardItem && typeof navigator.clipboard.write === 'function') {
         var item = null;
@@ -385,6 +409,32 @@
   if (camonFlow.inputs.linhVuc) {
     camonFlow.inputs.linhVuc.addEventListener('input', updateCamonChipsState);
   }
+
+  // ---- Tab NTT (Nhà tài trợ) ----
+  var nttFlow = makeHtttFlow({
+    type: 'ntt',
+    state: nttState,
+    inputs: { nhaTaiTro: '#f5-nhaTaiTro', demTen: '#f5-demTen', ngay: '#f5-ngay', hoTen: '#f5-hoTen' },
+    radios: [],
+    preview: '#preview-ntt',
+    btnDownload: '#btn-download-ntt',
+    btnCopy: '#btn-copy-ntt',
+    blockReason: '#block-reason-ntt',
+    errAttr: 'data-err5',
+  });
+
+  // ---- Tab BTTT (Bảo trợ truyền thông) ----
+  var btttFlow = makeHtttFlow({
+    type: 'bttt',
+    state: btttState,
+    inputs: { donViBttt: '#f6-donViBttt', demTen: '#f6-demTen', ngay: '#f6-ngay', hoTen: '#f6-hoTen' },
+    radios: [],
+    preview: '#preview-bttt',
+    btnDownload: '#btn-download-bttt',
+    btnCopy: '#btn-copy-bttt',
+    blockReason: '#block-reason-bttt',
+    errAttr: 'data-err6',
+  });
 
   // ---- Tab chủ đề email (FR-7): dùng chung Lĩnh vực + Nghệ danh của form Thư mời ----
   var SUBJECT_PREFIX = 'Sắc Hồng Hy Vọng XXVII | Thư mời ';
@@ -560,4 +610,6 @@
   htttFlow.render();
   htttNsFlow.render();
   camonFlow.render();
+  nttFlow.render();
+  btttFlow.render();
 })();

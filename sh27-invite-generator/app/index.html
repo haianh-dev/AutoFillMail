@@ -22,6 +22,8 @@
   <button type="button" class="tab" data-tab="httt" aria-selected="false">Mail trả lời khi bị từ chối &amp; ngỏ lời HTTT</button>
   <button type="button" class="tab" data-tab="httt-ns" aria-selected="false">Mail HTTT gửi thẳng nghệ sĩ</button>
   <button type="button" class="tab" data-tab="cam-on" aria-selected="false">Chỉ cảm ơn KOL/KOC</button>
+  <button type="button" class="tab" data-tab="ntt" aria-selected="false">Thư mời Nhà tài trợ</button>
+  <button type="button" class="tab" data-tab="bttt" aria-selected="false">Thư mời Bảo trợ truyền thông</button>
 </nav>
 
 <main class="layout" id="tab-invite">
@@ -370,6 +372,94 @@
       <h2>Xem trước</h2>
     </div>
     <iframe id="preview-camon" class="preview-frame" sandbox="allow-popups allow-popups-to-escape-sandbox" title="Xem trước thư cảm ơn KOL/KOC"></iframe>
+  </section>
+</main>
+
+<main class="layout" id="tab-ntt" hidden>
+  <section class="panel form-panel">
+    <div class="field">
+      <label class="label" for="f5-nhaTaiTro">Tên nhà tài trợ <em>*</em></label>
+      <input id="f5-nhaTaiTro" type="text" maxlength="120" placeholder="Ví dụ: Công ty TNHH ABC">
+      <p class="err" data-err5="nhaTaiTro"></p>
+    </div>
+
+    <hr class="divider">
+    <p class="section-title">Người gửi</p>
+
+    <div class="field">
+      <label class="label" for="f5-demTen">Đệm + tên của bạn <em>*</em></label>
+      <input id="f5-demTen" type="text" maxlength="80" placeholder="Ví dụ: Hải Anh">
+      <p class="err" data-err5="demTen"></p>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f5-ngay">Ngày hồi âm <em>*</em></label>
+      <input id="f5-ngay" type="date">
+      <p class="err" data-err5="ngay"></p>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f5-hoTen">Họ và tên của bạn <em>*</em></label>
+      <input id="f5-hoTen" type="text" maxlength="80" placeholder="Ví dụ: Nguyễn Hải Anh">
+      <p class="err" data-err5="hoTen"></p>
+    </div>
+
+    <div class="actions">
+      <button id="btn-download-ntt" type="button" class="btn primary" disabled>Tải file HTML</button>
+      <button id="btn-copy-ntt" type="button" class="btn" disabled>Sao chép HTML (dán vào Gmail)</button>
+      <p class="hint" id="block-reason-ntt"></p>
+    </div>
+  </section>
+
+  <section class="panel preview-panel">
+    <div class="preview-head">
+      <h2>Xem trước</h2>
+    </div>
+    <iframe id="preview-ntt" class="preview-frame" sandbox="allow-popups allow-popups-to-escape-sandbox" title="Xem trước thư mời Nhà tài trợ"></iframe>
+  </section>
+</main>
+
+<main class="layout" id="tab-bttt" hidden>
+  <section class="panel form-panel">
+    <div class="field">
+      <label class="label" for="f6-donViBttt">Tên đơn vị bảo trợ truyền thông <em>*</em></label>
+      <input id="f6-donViBttt" type="text" maxlength="120" placeholder="Ví dụ: Báo Thanh Niên">
+      <p class="err" data-err6="donViBttt"></p>
+    </div>
+
+    <hr class="divider">
+    <p class="section-title">Người gửi</p>
+
+    <div class="field">
+      <label class="label" for="f6-demTen">Đệm + tên của bạn <em>*</em></label>
+      <input id="f6-demTen" type="text" maxlength="80" placeholder="Ví dụ: Hải Anh">
+      <p class="err" data-err6="demTen"></p>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f6-ngay">Ngày hồi âm <em>*</em></label>
+      <input id="f6-ngay" type="date">
+      <p class="err" data-err6="ngay"></p>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f6-hoTen">Họ và tên của bạn <em>*</em></label>
+      <input id="f6-hoTen" type="text" maxlength="80" placeholder="Ví dụ: Nguyễn Hải Anh">
+      <p class="err" data-err6="hoTen"></p>
+    </div>
+
+    <div class="actions">
+      <button id="btn-download-bttt" type="button" class="btn primary" disabled>Tải file HTML</button>
+      <button id="btn-copy-bttt" type="button" class="btn" disabled>Sao chép HTML (dán vào Gmail)</button>
+      <p class="hint" id="block-reason-bttt"></p>
+    </div>
+  </section>
+
+  <section class="panel preview-panel">
+    <div class="preview-head">
+      <h2>Xem trước</h2>
+    </div>
+    <iframe id="preview-bttt" class="preview-frame" sandbox="allow-popups allow-popups-to-escape-sandbox" title="Xem trước thư mời Bảo trợ truyền thông"></iframe>
   </section>
 </main>
 

@@ -381,5 +381,72 @@ test('T-H12b', 'dòng ký tên không có dấu chấm', () => {
   assert.ok(!GOLDEN_TEXT.includes('Nguyễn Hải Anh.'), 'ký tên còn dấu chấm');
 });
 
+// ---- NTT: Thư mời Nhà tài trợ ----
+const NTT = readFileSync(join(root, 'templates', 'ntt.html'), 'utf8');
+const NTT_BASE = {
+  type: 'ntt',
+  nhaTaiTro: 'Công ty TNHH ABC',
+  demTen: 'Hải Anh',
+  ngay: '2026-11-15',
+  hoTen: 'Nguyễn Hải Anh',
+};
+const outNTT = fill.fill(NTT, NTT_BASE);
+test('T-NTT1 ntt', 'Kính gửi [Nhà tài trợ] đúng tên', () => {
+  assert.ok(outNTT.includes('<strong>Công ty TNHH ABC</strong>'));
+  assert.ok(outNTT.includes('Kính gửi'));
+});
+test('T-NTT2 ntt', 'Mình là [đệm + tên] đúng', () => {
+  assert.ok(outNTT.includes('Mình là Hải Anh'));
+});
+test('T-NTT3 ntt', 'Ngày hồi âm đúng', () => {
+  assert.ok(outNTT.includes('trước ngày 15/11/2026'));
+});
+test('T-NTT4 ntt', 'Ký tên đúng, không dấu chấm', () => {
+  assert.ok(outNTT.includes('<em>Nguyễn Hải Anh</em>'));
+  assert.ok(!outNTT.includes('Nguyễn Hải Anh.'));
+});
+test('T-NTT5 ntt', 'Không sót placeholder', () => {
+  assert.deepStrictEqual(fill.findLeftovers(outNTT), []);
+});
+test('T-NTT6 ntt', 'validate ntt: cần nhaTaiTro + demTen + ngay + hoTen', () => {
+  const r1 = fill.validate({ type: 'ntt', demTen: 'a', ngay: '2026-01-01', hoTen: 'b' });
+  assert.ok(!r1.ok && r1.errors.nhaTaiTro, 'thiếu nhaTaiTro vẫn ok');
+  const r2 = fill.validate(NTT_BASE);
+  assert.ok(r2.ok);
+});
+
+// ---- BTTT: Thư mời Bảo trợ truyền thông ----
+const BTTT = readFileSync(join(root, 'templates', 'bttt.html'), 'utf8');
+const BTTT_BASE = {
+  type: 'bttt',
+  donViBttt: 'Báo Thanh Niên',
+  demTen: 'Hải Anh',
+  ngay: '2026-11-15',
+  hoTen: 'Nguyễn Hải Anh',
+};
+const outBTTT = fill.fill(BTTT, BTTT_BASE);
+test('T-BTTT1 bttt', 'Kính gửi [Đơn vị BTTT] đúng tên', () => {
+  assert.ok(outBTTT.includes('Kính gửi <strong>Báo Thanh Niên</strong>,'));
+});
+test('T-BTTT2 bttt', 'Mình là [đệm + tên] đúng', () => {
+  assert.ok(outBTTT.includes('Mình là Hải Anh'));
+});
+test('T-BTTT3 bttt', 'Ngày hồi âm đúng', () => {
+  assert.ok(outBTTT.includes('trước ngày 15/11/2026'));
+});
+test('T-BTTT4 bttt', 'Ký tên đúng, không dấu chấm', () => {
+  assert.ok(outBTTT.includes('<em>Nguyễn Hải Anh</em>'));
+  assert.ok(!outBTTT.includes('Nguyễn Hải Anh.'));
+});
+test('T-BTTT5 bttt', 'Không sót placeholder', () => {
+  assert.deepStrictEqual(fill.findLeftovers(outBTTT), []);
+});
+test('T-BTTT6 bttt', 'validate bttt: cần donViBttt + demTen + ngay + hoTen', () => {
+  const r1 = fill.validate({ type: 'bttt', demTen: 'a', ngay: '2026-01-01', hoTen: 'b' });
+  assert.ok(!r1.ok && r1.errors.donViBttt, 'thiếu donViBttt vẫn ok');
+  const r2 = fill.validate(BTTT_BASE);
+  assert.ok(r2.ok);
+});
+
 console.log(`\nKết quả: ${passed} PASS, ${failed} FAIL`);
 process.exit(failed ? 1 : 0);

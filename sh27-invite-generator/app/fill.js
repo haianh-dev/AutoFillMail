@@ -8,7 +8,7 @@
 
   // Regex gộp single-pass (docs/03 §3): P5 gồm cả dấu chấm đi kèm (\.?); P2 chấp nhận &nbsp;, khoảng trắng hoặc không gì giữa "/" và "tên KOLs"
   var PLACEHOLDER_RE =
-    /\[Lĩnh vực\]|\[Nghệ danh\/(?:&nbsp;|\s)?tên KOLs\]|\[Anh\/Chị\]|\[Quản lý\]|\[XH QL\]|\[XH NS\]|\[Tên NS\]|\[đệm \+ tên\]|\[Họ và tên\]\.?|\.\.\.\/\.\.\.\/2026/g;
+    /\[Lĩnh vực\]|\[Nghệ danh\/(?:&nbsp;|\s)?tên KOLs\]|\[Anh\/Chị\]|\[Quản lý\]|\[XH QL\]|\[XH NS\]|\[Tên NS\]|\[Đơn vị BTTT\]|\[Nhà tài trợ\]|\[đệm \+ tên\]|\[Họ và tên\]\.?|\.\.\.\/\.\.\.\/2026/g;
 
   var KEY_BY_PREFIX = [
     ['[Lĩnh', 'linhVuc'],
@@ -18,13 +18,15 @@
     ['[XH QL]', 'xungHoQL'],
     ['[XH NS]', 'xungHoNS'],
     ['[Tên NS]', 'nntTen'],
+    ['[Đơn vị BTTT]', 'donViBttt'],
+    ['[Nhà tài trợ]', 'nhaTaiTro'],
     ['[đệm', 'demTen'],
     ['[Họ', 'hoTen'],
     ['...', 'ngay'],
   ];
 
   // Pattern kiểm tra placeholder còn sót (docs/03 §3)
-  var LEFTOVER_BRACKET_RE = /\[(?:Lĩnh vực|Nghệ danh|Anh\/Chị|Quản lý|XH QL|XH NS|Tên NS|đệm|Họ và tên)[^\]]*\]/;
+  var LEFTOVER_BRACKET_RE = /\[(?:Lĩnh vực|Nghệ danh|Anh\/Chị|Quản lý|XH QL|XH NS|Tên NS|Đơn vị BTTT|Nhà tài trợ|đệm|Họ và tên)[^\]]*\]/;
   var LEFTOVER_DATE_RE = /\.\.\.\/\.\.\.\/2026/;
 
   // docs/03 §4.2: ngay trước token (bỏ qua khoảng trắng, &nbsp;, thẻ strong/em/span/b/i)
@@ -80,6 +82,8 @@
     ngay: 'ngày hồi âm',
     nntTen: 'tên nghệ sĩ / người nổi tiếng',
     quanLy: 'tên người quản lý',
+    nhaTaiTro: 'tên nhà tài trợ',
+    donViBttt: 'tên đơn vị bảo trợ truyền thông',
   };
 
   // Thư HTTT & Cảm ơn không có [đệm + tên], [ngày], [Nghệ danh] — cần chỗ khác tùy bản thư
@@ -87,6 +91,8 @@
     httt: ['quanLy', 'nntTen', 'hoTen'],
     'httt-ns': ['nntTen', 'hoTen'],
     'cam-on': ['linhVuc', 'nntTen', 'hoTen'],
+    ntt: ['nhaTaiTro', 'demTen', 'ngay', 'hoTen'],
+    bttt: ['donViBttt', 'demTen', 'ngay', 'hoTen'],
   };
 
   function validate(values) {
@@ -153,6 +159,8 @@
       ngheDanh: escapeHtml(normalizeText(v.ngheDanh)),
       quanLy: escapeHtml(normalizeText(v.quanLy)),
       nntTen: escapeHtml(normalizeText(v.nntTen)),
+      nhaTaiTro: escapeHtml(normalizeText(v.nhaTaiTro)),
+      donViBttt: escapeHtml(normalizeText(v.donViBttt)),
       demTen: escapeHtml(normalizeText(v.demTen)),
       hoTen: escapeHtml(normalizeText(v.hoTen)),
       ngay: formatDate(v.ngay),
