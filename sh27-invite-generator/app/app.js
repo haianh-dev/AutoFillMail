@@ -28,9 +28,10 @@
   var lastValidHtml = null;
   var blobUrl = null;
 
-  // ---- Trạng thái tab HTTT (qua quản lý) & HTTT-NS (gửi thẳng nghệ sĩ) ----
+  // ---- Trạng thái tab HTTT (qua quản lý), HTTT-NS (gửi thẳng nghệ sĩ) & Cảm ơn ----
   var htttState = { quanLy: '', nntTen: '', xungHoQL: 'anh', xungHoNS: 'anh', tuGoi: 'em', hoTen: '' };
   var htttNsState = { nntTen: '', xungHoNS: 'anh', tuGoi: 'em', hoTen: '' };
+  var camonState = { linhVuc: '', nntTen: '', xungHoNS: 'anh', tuGoi: 'em', hoTen: '' };
 
   // ---- Phần tử DOM ----
   var $ = function (sel) { return document.querySelector(sel); };
@@ -72,8 +73,8 @@
       var saved = JSON.parse(raw);
       if (saved.hoTen) {
         values.hoTen = saved.hoTen; inputs.hoTen.value = saved.hoTen;
-        // seed cả 2 flow HTTT (được tạo sau nhưng loadSender luôn chạy sau cùng)
-        [htttFlow, htttNsFlow].forEach(function (flow) {
+        // seed cả 3 flow HTTT & Cảm ơn (được tạo sau nhưng loadSender luôn chạy sau cùng)
+        [htttFlow, htttNsFlow, camonFlow].forEach(function (flow) {
           flow.state.hoTen = saved.hoTen;
           flow.inputs.hoTen.value = saved.hoTen;
         });
@@ -206,6 +207,7 @@
       document.getElementById('tab-subject').hidden = tab.dataset.tab !== 'subject';
       document.getElementById('tab-httt').hidden = tab.dataset.tab !== 'httt';
       document.getElementById('tab-httt-ns').hidden = tab.dataset.tab !== 'httt-ns';
+      document.getElementById('tab-cam-on').hidden = tab.dataset.tab !== 'cam-on';
     });
   });
 
@@ -339,6 +341,50 @@
     blockReason: '#block-reason-httt-ns',
     errAttr: 'data-err3',
   });
+
+  var camonFlow = makeHtttFlow({
+    type: 'cam-on',
+    state: camonState,
+    inputs: { linhVuc: '#f4-linhVuc', nntTen: '#f4-nntTen', hoTen: '#f4-hoTen' },
+    radios: [
+      { name: 'xungHo4', key: 'xungHoNS' },
+      { name: 'tuGoi4', key: 'tuGoi' },
+    ],
+    preview: '#preview-camon',
+    btnDownload: '#btn-download-camon',
+    btnCopy: '#btn-copy-camon',
+    blockReason: '#block-reason-camon',
+    errAttr: 'data-err4',
+  });
+
+  // Chips cho tab cảm ơn
+  var camonChips = $('#linhVuc-chips-camon');
+  function updateCamonChipsState() {
+    if (!camonChips) return;
+    var current = (camonState.linhVuc || '').trim().toLowerCase();
+    Array.prototype.forEach.call(camonChips.querySelectorAll('.chip'), function (chip) {
+      chip.classList.toggle('active', chip.dataset.val.toLowerCase() === current);
+    });
+  }
+  if (camonChips) {
+    camonChips.addEventListener('click', function (e) {
+      var chip = e.target.closest('.chip');
+      if (!chip) return;
+      var val = chip.dataset.val;
+      if (camonState.linhVuc === val) {
+        camonState.linhVuc = '';
+        camonFlow.inputs.linhVuc.value = '';
+      } else {
+        camonState.linhVuc = val;
+        camonFlow.inputs.linhVuc.value = val;
+      }
+      updateCamonChipsState();
+      camonFlow.render();
+    });
+  }
+  if (camonFlow.inputs.linhVuc) {
+    camonFlow.inputs.linhVuc.addEventListener('input', updateCamonChipsState);
+  }
 
   // ---- Tab chủ đề email (FR-7): dùng chung Lĩnh vực + Nghệ danh của form Thư mời ----
   var SUBJECT_PREFIX = 'Sắc Hồng Hy Vọng XXVII | Thư mời ';
@@ -513,4 +559,5 @@
   render();
   htttFlow.render();
   htttNsFlow.render();
+  camonFlow.render();
 })();

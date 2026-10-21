@@ -169,7 +169,7 @@ test('T-H2 httt', 'xưng hô QL và NS tách riêng đúng chỗ', () => {
 test('T-H3 httt', 'tên NS điền đủ các chỗ in đậm', () => {
   assert.strictEqual(countMatches(outH, /<strong>Chị Osad<\/strong>/g), 3);
   assert.strictEqual(countMatches(outH, /<strong>Anh và Chị Osad<\/strong>/g), 3);
-  assert.ok(outH.includes('<strong>Hỗ Trợ Truyền Thống</strong>'));
+  assert.ok(outH.includes('<strong>Hỗ Trợ Truyền Thông</strong>'));
 });
 test('T-H4 httt', 'tự xưng em giữ nguyên + chữ ký, không sót placeholder', () => {
   assert.ok(outH.includes('em xin gửi lời cảm ơn'));
@@ -221,6 +221,38 @@ test('T-H11 httt-ns', 'validate httt-ns: chỉ cần nntTen+hoTen', () => {
   const r1 = fill.validate({ type: 'httt-ns', nntTen: 'a' });
   assert.ok(!r1.ok && r1.errors.hoTen && !r1.errors.quanLy && !r1.errors.linhVuc);
   const r2 = fill.validate({ type: 'httt-ns', nntTen: 'a', hoTen: 'b' });
+  assert.ok(r2.ok);
+});
+
+// ---- CAM-ON: Thư chỉ cảm ơn KOL/KOC ----
+const CAM_ON = readFileSync(join(root, 'templates', 'cam-on.html'), 'utf8');
+const CAM_ON_BASE = {
+  type: 'cam-on',
+  linhVuc: 'Content Creator',
+  nntTen: 'Tun Phạm',
+  xungHoNS: 'anh',
+  tuGoi: 'em',
+  hoTen: 'Vũ Thái Tuấn',
+};
+const outC = fill.fill(CAM_ON, CAM_ON_BASE);
+test('T-CO1 cam-on', 'Điền đúng các placeholder và in đậm', () => {
+  assert.ok(outC.includes('Dear <strong>Content Creator Tun Phạm và Team</strong>,'));
+  assert.ok(outC.includes('cảm ơn <strong>Anh Tun Phạm</strong> cùng <strong>Team</strong>'));
+  assert.ok(outC.includes('đồng hành cùng <strong>Anh Tun Phạm</strong> trong các'));
+  assert.ok(outC.includes('kính chúc <strong>Anh</strong> nhiều sức khỏe'));
+  assert.ok(outC.includes('<strong>Trân trọng,</strong>'));
+  assert.ok(outC.includes('<em>Vũ Thái Tuấn</em>'));
+  assert.deepStrictEqual(fill.findLeftovers(outC), []);
+});
+test('T-CO2 cam-on', 'Đổi xưng hô sang Chị', () => {
+  const outChi = fill.fill(CAM_ON, { ...CAM_ON_BASE, xungHoNS: 'chị' });
+  assert.ok(outChi.includes('cảm ơn <strong>Chị Tun Phạm</strong>'));
+  assert.ok(outChi.includes('kính chúc <strong>Chị</strong> nhiều sức khỏe'));
+});
+test('T-CO3 cam-on', 'validate cam-on: cần linhVuc + nntTen + hoTen', () => {
+  const r1 = fill.validate({ type: 'cam-on', nntTen: 'Tun', hoTen: 'Vũ' });
+  assert.ok(!r1.ok && r1.errors.linhVuc);
+  const r2 = fill.validate(CAM_ON_BASE);
   assert.ok(r2.ok);
 });
 

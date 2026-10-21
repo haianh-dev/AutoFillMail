@@ -82,10 +82,11 @@
     quanLy: 'tên người quản lý',
   };
 
-  // Thư HTTT không có [đệm + tên], [ngày], [Nghệ danh] — cần chỗ khác tùy bản thư
+  // Thư HTTT & Cảm ơn không có [đệm + tên], [ngày], [Nghệ danh] — cần chỗ khác tùy bản thư
   var REQUIRED_BY_TYPE = {
     httt: ['quanLy', 'nntTen', 'hoTen'],
     'httt-ns': ['nntTen', 'hoTen'],
+    'cam-on': ['linhVuc', 'nntTen', 'hoTen'],
   };
 
   function validate(values) {

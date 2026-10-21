@@ -21,6 +21,7 @@
   <button type="button" class="tab" data-tab="subject" aria-selected="false">Chủ đề email</button>
   <button type="button" class="tab" data-tab="httt" aria-selected="false">Mail trả lời khi bị từ chối &amp; ngỏ lời HTTT</button>
   <button type="button" class="tab" data-tab="httt-ns" aria-selected="false">Mail HTTT gửi thẳng nghệ sĩ</button>
+  <button type="button" class="tab" data-tab="cam-on" aria-selected="false">Chỉ cảm ơn KOL/KOC</button>
 </nav>
 
 <main class="layout" id="tab-invite">
@@ -286,6 +287,89 @@
       <h2>Xem trước</h2>
     </div>
     <iframe id="preview-httt-ns" class="preview-frame" sandbox="allow-popups allow-popups-to-escape-sandbox" title="Xem trước thư HTTT gửi thẳng nghệ sĩ"></iframe>
+  </section>
+</main>
+
+<main class="layout" id="tab-cam-on" hidden>
+  <section class="panel form-panel">
+    <div class="field">
+      <label class="label" for="f4-linhVuc">Ngành nghề / Lĩnh vực <em>*</em></label>
+      <input id="f4-linhVuc" type="text" maxlength="80" placeholder="Ví dụ: Content Creator, Ca sĩ, MC" list="linhVuc-list" autocomplete="off">
+      <div class="field-chips" id="linhVuc-chips-camon" aria-label="Gợi ý chọn nhanh ngành nghề">
+        <button type="button" class="chip" data-val="Ca sĩ">Ca sĩ</button>
+        <button type="button" class="chip" data-val="Diễn viên">Diễn viên</button>
+        <button type="button" class="chip" data-val="Vận Động Viên">Vận Động Viên</button>
+        <button type="button" class="chip" data-val="MC">MC</button>
+        <button type="button" class="chip" data-val="Content Creator">Content Creator</button>
+        <button type="button" class="chip" data-val="Diễn giả">Diễn giả</button>
+        <button type="button" class="chip" data-val="Cầu thủ">Cầu thủ</button>
+        <button type="button" class="chip" data-val="Rapper">Rapper</button>
+        <button type="button" class="chip" data-val="Nhà sản xuất âm nhạc">Nhà sản xuất âm nhạc</button>
+        <button type="button" class="chip" data-val="Nghệ sĩ">Nghệ sĩ</button>
+        <button type="button" class="chip" data-val="Nhà báo">Nhà báo</button>
+        <button type="button" class="chip" data-val="NSND">NSND</button>
+        <button type="button" class="chip" data-val="NSUT">NSUT</button>
+        <button type="button" class="chip" data-val="Hoa hậu">Hoa hậu</button>
+        <button type="button" class="chip" data-val="Biên tập viên">Biên tập viên</button>
+        <button type="button" class="chip" data-val="Đạo diễn">Đạo diễn</button>
+        <button type="button" class="chip" data-val="Nhóm nhạc">Nhóm nhạc</button>
+        <button type="button" class="chip" data-val="Ban nhạc">Ban nhạc</button>
+        <button type="button" class="chip" data-val="Người mẫu">Người mẫu</button>
+        <button type="button" class="chip" data-val="Nam vương">Nam vương</button>
+        <button type="button" class="chip" data-val="Doanh nhân">Doanh nhân</button>
+        <button type="button" class="chip" data-val="Producer">Producer</button>
+      </div>
+      <p class="err" data-err4="linhVuc"></p>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f4-nntTen">Tên KOL / KOC / Nghệ sĩ <em>*</em></label>
+      <input id="f4-nntTen" type="text" maxlength="80" placeholder="Ví dụ: Tun Phạm">
+      <p class="err" data-err4="nntTen"></p>
+    </div>
+
+    <div class="field">
+      <span class="label">Xưng hô với nghệ sĩ <em>*</em></span>
+      <div class="radio-row">
+        <label><input type="radio" name="xungHo4" value="anh" checked> Anh</label>
+        <label><input type="radio" name="xungHo4" value="chị"> Chị</label>
+        <label><input type="radio" name="xungHo4" value="cô"> Cô</label>
+        <label><input type="radio" name="xungHo4" value="chú"> Chú</label>
+        <label><input type="radio" name="xungHo4" value="anh chị"> Anh Chị</label>
+        <label><input type="radio" name="xungHo4" value="band"> Band</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="label">Tự xưng là <em>*</em></span>
+      <div class="radio-row">
+        <label><input type="radio" name="tuGoi4" value="em" checked> Em</label>
+        <label><input type="radio" name="tuGoi4" value="con"> Con</label>
+        <label><input type="radio" name="tuGoi4" value="cháu"> Cháu</label>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <p class="section-title">Người gửi</p>
+
+    <div class="field">
+      <label class="label" for="f4-hoTen">Họ và tên của bạn <em>*</em></label>
+      <input id="f4-hoTen" type="text" maxlength="80" placeholder="Ví dụ: Vũ Thái Tuấn">
+      <p class="err" data-err4="hoTen"></p>
+    </div>
+
+    <div class="actions">
+      <button id="btn-download-camon" type="button" class="btn primary" disabled>Tải file HTML</button>
+      <button id="btn-copy-camon" type="button" class="btn" disabled>Sao chép HTML (dán vào Gmail)</button>
+      <p class="hint" id="block-reason-camon"></p>
+    </div>
+  </section>
+
+  <section class="panel preview-panel">
+    <div class="preview-head">
+      <h2>Xem trước</h2>
+    </div>
+    <iframe id="preview-camon" class="preview-frame" sandbox="allow-popups allow-popups-to-escape-sandbox" title="Xem trước thư cảm ơn KOL/KOC"></iframe>
   </section>
 </main>
 
