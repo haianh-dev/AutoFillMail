@@ -186,6 +186,37 @@
     return out;
   }
 
+  var SUBJECT_TEMPLATES = {
+    kmdh: function (v) {
+      var lv = normalizeText(v.linhVuc);
+      var nd = normalizeText(v.ngheDanh);
+      return (lv && nd) ? 'Sắc Hồng Hy Vọng XXVII | Thư mời Khách mời đồng hành | ' + lv + ' ' + nd : '';
+    },
+    nvtch: function (v) {
+      var lv = normalizeText(v.linhVuc);
+      var nd = normalizeText(v.ngheDanh);
+      return (lv && nd) ? 'Sắc Hồng Hy Vọng XXVII | Thư mời Nhân vật truyền cảm hứng | ' + lv + ' ' + nd : '';
+    },
+    dsnh: function (v) {
+      var lv = normalizeText(v.linhVuc);
+      var nd = normalizeText(v.ngheDanh);
+      return (lv && nd) ? 'Sắc Hồng Hy Vọng XXVII | Thư mời Đại sứ ngày hội | ' + lv + ' ' + nd : '';
+    },
+    bttt: function (v) {
+      var dv = normalizeText(v.donViBttt);
+      return dv ? 'Sắc Hồng Hy Vọng XXVII | Thư mời Hợp tác Bảo trợ truyền thông | ' + dv : '';
+    },
+    ntt: function (v) {
+      var ntt = normalizeText(v.nhaTaiTro);
+      return ntt ? 'Sắc Hồng Hy Vọng XXVII | Thư mời Hợp tác Tài trợ | ' + ntt : '';
+    },
+  };
+
+  function buildSubject(type, data) {
+    var fn = SUBJECT_TEMPLATES[type];
+    return fn ? fn(data || {}) : '';
+  }
+
   return {
     PLACEHOLDER_RE: PLACEHOLDER_RE,
     normalizeText: normalizeText,
@@ -199,5 +230,6 @@
     replaceSelfRef: replaceSelfRef,
     fill: fill,
     findLeftovers: findLeftovers,
+    buildSubject: buildSubject,
   };
 });

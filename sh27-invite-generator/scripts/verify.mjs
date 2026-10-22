@@ -448,5 +448,47 @@ test('T-BTTT6 bttt', 'validate bttt: cần donViBttt + demTen + ngay + hoTen', (
   assert.ok(r2.ok);
 });
 
+// ---- Subject: Chủ đề email ----
+test('T-SUB1 kmdh/nvtch/dsnh', 'buildSubject cho thư mời người nổi tiếng', () => {
+  assert.strictEqual(
+    fill.buildSubject('kmdh', { linhVuc: 'Diễn viên', ngheDanh: 'Lưu Duy Khánh' }),
+    'Sắc Hồng Hy Vọng XXVII | Thư mời Khách mời đồng hành | Diễn viên Lưu Duy Khánh'
+  );
+  assert.strictEqual(
+    fill.buildSubject('nvtch', { linhVuc: 'Ca sĩ', ngheDanh: 'Hà Anh Tuấn' }),
+    'Sắc Hồng Hy Vọng XXVII | Thư mời Nhân vật truyền cảm hứng | Ca sĩ Hà Anh Tuấn'
+  );
+  assert.strictEqual(
+    fill.buildSubject('dsnh', { linhVuc: 'MC', ngheDanh: 'Trần B' }),
+    'Sắc Hồng Hy Vọng XXVII | Thư mời Đại sứ ngày hội | MC Trần B'
+  );
+  assert.strictEqual(fill.buildSubject('kmdh', { linhVuc: '', ngheDanh: 'Lưu Duy Khánh' }), '');
+  assert.strictEqual(fill.buildSubject('kmdh', { linhVuc: 'MC', ngheDanh: '' }), '');
+});
+
+test('T-SUB2 bttt', 'buildSubject cho Bảo trợ truyền thông', () => {
+  assert.strictEqual(
+    fill.buildSubject('bttt', { donViBttt: 'Báo Thanh Niên' }),
+    'Sắc Hồng Hy Vọng XXVII | Thư mời Hợp tác Bảo trợ truyền thông | Báo Thanh Niên'
+  );
+  assert.strictEqual(
+    fill.buildSubject('bttt', { donViBttt: '  VTV3   Đài Truyền hình  ' }),
+    'Sắc Hồng Hy Vọng XXVII | Thư mời Hợp tác Bảo trợ truyền thông | VTV3 Đài Truyền hình'
+  );
+  assert.strictEqual(fill.buildSubject('bttt', { donViBttt: '' }), '');
+});
+
+test('T-SUB3 ntt', 'buildSubject cho Nhà tài trợ', () => {
+  assert.strictEqual(
+    fill.buildSubject('ntt', { nhaTaiTro: 'Công ty TNHH ABC' }),
+    'Sắc Hồng Hy Vọng XXVII | Thư mời Hợp tác Tài trợ | Công ty TNHH ABC'
+  );
+  assert.strictEqual(
+    fill.buildSubject('ntt', { nhaTaiTro: '  Tập đoàn   Vingroup  ' }),
+    'Sắc Hồng Hy Vọng XXVII | Thư mời Hợp tác Tài trợ | Tập đoàn Vingroup'
+  );
+  assert.strictEqual(fill.buildSubject('ntt', { nhaTaiTro: '' }), '');
+});
+
 console.log(`\nKết quả: ${passed} PASS, ${failed} FAIL`);
 process.exit(failed ? 1 : 0);

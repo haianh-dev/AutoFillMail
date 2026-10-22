@@ -266,6 +266,8 @@
         if (errEl) errEl.textContent = msg;
         if (inputs[key]) inputs[key].classList.toggle('invalid', !!msg);
       });
+
+      if (typeof cfg.onRender === 'function') cfg.onRender(state);
     }
 
     function scheduleRender() {
@@ -421,6 +423,7 @@
     btnCopy: '#btn-copy-ntt',
     blockReason: '#block-reason-ntt',
     errAttr: 'data-err5',
+    onRender: function () { renderSubjects(); },
   });
 
   // ---- Tab BTTT (Bảo trợ truyền thông) ----
@@ -434,44 +437,48 @@
     btnCopy: '#btn-copy-bttt',
     blockReason: '#block-reason-bttt',
     errAttr: 'data-err6',
+    onRender: function () { renderSubjects(); },
   });
 
-  // ---- Tab chủ đề email (FR-7): dùng chung Lĩnh vực + Nghệ danh của form Thư mời ----
-  var SUBJECT_PREFIX = 'Sắc Hồng Hy Vọng XXVII | Thư mời ';
-  var SUBJECT_ROLES = {
-    kmdh: 'Khách mời đồng hành',
-    nvtch: 'Nhân vật truyền cảm hứng',
-    dsnh: 'Đại sứ ngày hội',
-  };
+  // ---- Tab chủ đề email (FR-7): tự động điền từ các tab tương ứng ----
+  var ALL_SUBJECT_TYPES = ['kmdh', 'nvtch', 'dsnh', 'bttt', 'ntt'];
   var subjectButtons = {
     kmdh: $('#btn-copy-subject-kmdh'),
     nvtch: $('#btn-copy-subject-nvtch'),
     dsnh: $('#btn-copy-subject-dsnh'),
+    bttt: $('#btn-copy-subject-bttt'),
+    ntt: $('#btn-copy-subject-ntt'),
   };
   var subjectOutputs = {
     kmdh: $('#subject-kmdh'),
     nvtch: $('#subject-nvtch'),
     dsnh: $('#subject-dsnh'),
+    bttt: $('#subject-bttt'),
+    ntt: $('#subject-ntt'),
   };
 
-  function buildSubject(type) {
-    var lv = F.normalizeText(values.linhVuc);
-    var nd = F.normalizeText(values.ngheDanh);
-    if (!lv || !nd) return '';
-    return SUBJECT_PREFIX + SUBJECT_ROLES[type] + ' | ' + lv + ' ' + nd;
+  function getSubject(type) {
+    if (type === 'bttt') return F.buildSubject('bttt', btttState);
+    if (type === 'ntt') return F.buildSubject('ntt', nttState);
+    return F.buildSubject(type, values);
   }
 
   function renderSubjects() {
-    ['kmdh', 'nvtch', 'dsnh'].forEach(function (type) {
-      var s = buildSubject(type);
-      subjectOutputs[type].textContent = s;
-      subjectButtons[type].disabled = !s;
+    ALL_SUBJECT_TYPES.forEach(function (type) {
+      var s = getSubject(type);
+      if (subjectOutputs[type]) {
+        subjectOutputs[type].textContent = s;
+      }
+      if (subjectButtons[type]) {
+        subjectButtons[type].disabled = !s;
+      }
     });
   }
 
-  ['kmdh', 'nvtch', 'dsnh'].forEach(function (type) {
+  ALL_SUBJECT_TYPES.forEach(function (type) {
+    if (!subjectButtons[type]) return;
     subjectButtons[type].addEventListener('click', function () {
-      var s = buildSubject(type);
+      var s = getSubject(type);
       if (!s) return;
       trackEvent('copy-subject-' + type);
       function done(ok) {

@@ -84,7 +84,14 @@ body {
   word-break: break-word;
   min-height: 39px;
 }
-.subject-text:empty::before { content: "Nhập Lĩnh vực và Nghệ danh/tên ở tab Thư mời…"; color: var(--muted); font-style: italic; }
+.subject-text:empty::before {
+  content: attr(data-empty);
+  color: var(--muted);
+  font-style: italic;
+}
+.subject-text:not([data-empty]):empty::before {
+  content: "Nhập Lĩnh vực và Nghệ danh/tên ở tab Thư mời…";
+}
 
 .layout {
   display: grid;
