@@ -35,6 +35,10 @@
   var nttState = { nhaTaiTro: '', demTen: '', ngay: '', hoTen: '' };
   var btttState = { donViBttt: '', demTen: '', ngay: '', hoTen: '' };
 
+  // ---- Trạng thái tab Nhắn Zalo / FB (NTT & NNT) ----
+  var msgNttState = { donVi: '', hoTen: '', ngay: '' };
+  var msgNntState = { type: 'kmdh', ngheDanh: '', xungHo: 'anh', tuGoi: 'em', kemLink: true, hoTen: '', ngay: '' };
+
   // ---- Phần tử DOM ----
   var $ = function (sel) { return document.querySelector(sel); };
   var inputs = {
@@ -80,6 +84,10 @@
           flow.state.hoTen = saved.hoTen;
           flow.inputs.hoTen.value = saved.hoTen;
         });
+        msgNttState.hoTen = saved.hoTen;
+        if (msgNttInputs.hoTen) msgNttInputs.hoTen.value = saved.hoTen;
+        msgNntState.hoTen = saved.hoTen;
+        if (msgNntInputs.hoTen) msgNntInputs.hoTen.value = saved.hoTen;
       }
       if (saved.demTen) {
         values.demTen = saved.demTen; inputs.demTen.value = saved.demTen; demTenTouched = true;
@@ -94,6 +102,10 @@
         [nttFlow, btttFlow].forEach(function (flow) {
           if (flow.inputs.ngay) { flow.state.ngay = saved.ngay; flow.inputs.ngay.value = saved.ngay; }
         });
+        msgNttState.ngay = saved.ngay;
+        if (msgNttInputs.ngay) msgNttInputs.ngay.value = saved.ngay;
+        msgNntState.ngay = saved.ngay;
+        if (msgNntInputs.ngay) msgNntInputs.ngay.value = saved.ngay;
       }
     } catch (e) { /* localStorage có thể bị chặn — bỏ qua */ }
   }
@@ -212,18 +224,32 @@
   });
 
   // ---- Chuyển tab ----
+  var ALL_TABS = ['invite', 'subject', 'httt', 'httt-ns', 'cam-on', 'ntt', 'bttt', 'msg-ntt', 'msg-nnt'];
   Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (tab) {
     tab.addEventListener('click', function () {
       Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (t) {
         t.setAttribute('aria-selected', String(t === tab));
       });
-      document.getElementById('tab-invite').hidden = tab.dataset.tab !== 'invite';
-      document.getElementById('tab-subject').hidden = tab.dataset.tab !== 'subject';
-      document.getElementById('tab-httt').hidden = tab.dataset.tab !== 'httt';
-      document.getElementById('tab-httt-ns').hidden = tab.dataset.tab !== 'httt-ns';
-      document.getElementById('tab-cam-on').hidden = tab.dataset.tab !== 'cam-on';
-      document.getElementById('tab-ntt').hidden = tab.dataset.tab !== 'ntt';
-      document.getElementById('tab-bttt').hidden = tab.dataset.tab !== 'bttt';
+      var curTab = tab.dataset.tab;
+      ALL_TABS.forEach(function (id) {
+        var el = document.getElementById('tab-' + id);
+        if (el) el.hidden = (id !== curTab);
+      });
+
+      // Gợi ý dữ liệu liên tab nếu cần
+      if (curTab === 'msg-ntt') {
+        if (!msgNttState.donVi && nttState.nhaTaiTro) {
+          msgNttState.donVi = nttState.nhaTaiTro;
+          msgNttInputs.donVi.value = nttState.nhaTaiTro;
+          renderMsgNtt();
+        }
+      } else if (curTab === 'msg-nnt') {
+        if (!msgNntState.ngheDanh && values.ngheDanh) {
+          msgNntState.ngheDanh = values.ngheDanh;
+          msgNntInputs.ngheDanh.value = values.ngheDanh;
+          renderMsgNnt();
+        }
+      }
     });
   });
 
@@ -608,6 +634,282 @@
     window.open(blobUrl, '_blank');
   });
 
+  // ==========================================
+  // LOGIC TAB NHẮN ZALO / FB (NTT & NNT)
+  // ==========================================
+  var msgNttInputs = {
+    donVi: $('#f-msg-ntt-donVi'),
+    hoTen: $('#f-msg-ntt-hoTen'),
+    ngay: $('#f-msg-ntt-ngay'),
+  };
+
+  var msgNntInputs = {
+    ngheDanh: $('#f-msg-nnt-ngheDanh'),
+    hoTen: $('#f-msg-nnt-hoTen'),
+    ngay: $('#f-msg-nnt-ngay'),
+    kemLink: $('#f-msg-nnt-kemLink'),
+  };
+  var msgNntTypeGroup = $('#msg-nnt-type-group');
+
+  function formatMsgPreviewHtml(rawText) {
+    var escaped = F.escapeHtml(rawText);
+    escaped = escaped.replace(/(\[[^\]]+\])/g, '<span class="msg-placeholder">$1</span>');
+    escaped = escaped.replace(/(https:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+    return escaped;
+  }
+
+  function copyPlainText(text, label) {
+    if (!text) return;
+    trackEvent('copy-msg');
+    function done(ok) {
+      showToast(ok ? ('Đã sao chép ' + (label || 'tin nhắn')) : 'Không sao chép được');
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(copyFallback(text)); });
+    } else {
+      done(copyFallback(text));
+    }
+  }
+
+  // ---- XÂY DỰNG TIN NHẮN NTT ----
+  function buildMsgNttData() {
+    var ten = (msgNttState.hoTen || '').trim();
+    var donVi = (msgNttState.donVi || '').trim();
+    var ngayFmt = F.formatDate(msgNttState.ngay);
+
+    var msg1 = 'Dạ em chào Quý đơn vị ạ. Em là ' + (ten || '[Tên]') + ', phụ trách Đối ngoại Ngày hội hiến máu Sắc Hồng Hy Vọng lần thứ XXVII của Trường ĐH Công nghệ - ĐHQGHN ạ.';
+
+    var msg2 = 'Sau khi tìm hiểu về ' + (donVi || '[Tên đơn vị]') + ', bên em muốn gửi lời mời hợp tác với vai trò nhà tài trợ cho chương trình ạ. Đây là chương trình hiến máu toàn trường lớn nhất trong các trường thuộc ĐHQGHN, tổ chức cùng Viện Huyết học - Truyền máu TW.\n' +
+      '- 7h30 – 16h30, thứ Hai 30/11/2026\n' +
+      '- Tầng 2 tòa đa năng, ĐH Công nghệ - ĐHQGHN (Hòa Lạc)\n' +
+      'Quý đơn vị xem giúp em hồ sơ tài trợ trong đó có đủ quyền lợi và thông tin chi tiết ạ:\n' +
+      '📄 [SHHV XXVII] HỒ SƠ TÀI TRỢ: https://drive.google.com/file/d/1-wSQs0wkFYopBaYUYvPCcIz8c4SpsgSq/view?usp=drive_link';
+
+    var msg3 = 'Bên em rất mong nhận được phản hồi trước ngày ' + (ngayFmt || '[../../2026]') + ' ạ. Cần hỗ trợ gì Quý đơn vị nhắn em nhé. Em cảm ơn Quý đơn vị nhiều ạ!';
+
+    return { msg1: msg1, msg2: msg2, msg3: msg3 };
+  }
+
+  function renderMsgNtt() {
+    var data = buildMsgNttData();
+    var p1 = $('#preview-msg-ntt-1');
+    var p2 = $('#preview-msg-ntt-2');
+    var p3 = $('#preview-msg-ntt-3');
+    if (p1) p1.innerHTML = formatMsgPreviewHtml(data.msg1);
+    if (p2) p2.innerHTML = formatMsgPreviewHtml(data.msg2);
+    if (p3) p3.innerHTML = formatMsgPreviewHtml(data.msg3);
+  }
+
+  if (msgNttInputs.donVi) {
+    msgNttInputs.donVi.addEventListener('input', function () {
+      msgNttState.donVi = msgNttInputs.donVi.value;
+      renderMsgNtt();
+    });
+  }
+  if (msgNttInputs.hoTen) {
+    msgNttInputs.hoTen.addEventListener('input', function () {
+      msgNttState.hoTen = msgNttInputs.hoTen.value;
+      saveSender({ hoTen: msgNttState.hoTen });
+      renderMsgNtt();
+    });
+  }
+  if (msgNttInputs.ngay) {
+    msgNttInputs.ngay.addEventListener('input', function () {
+      msgNttState.ngay = msgNttInputs.ngay.value;
+      saveSender({ ngay: msgNttState.ngay });
+      renderMsgNtt();
+    });
+  }
+
+  var btnCopyMsgNtt1 = $('#btn-copy-msg-ntt-1');
+  if (btnCopyMsgNtt1) {
+    btnCopyMsgNtt1.addEventListener('click', function () {
+      copyPlainText(buildMsgNttData().msg1, 'tin nhắn 1');
+    });
+  }
+  var btnCopyMsgNtt2 = $('#btn-copy-msg-ntt-2');
+  if (btnCopyMsgNtt2) {
+    btnCopyMsgNtt2.addEventListener('click', function () {
+      copyPlainText(buildMsgNttData().msg2, 'tin nhắn 2');
+    });
+  }
+  var btnCopyMsgNtt3 = $('#btn-copy-msg-ntt-3');
+  if (btnCopyMsgNtt3) {
+    btnCopyMsgNtt3.addEventListener('click', function () {
+      copyPlainText(buildMsgNttData().msg3, 'tin nhắn 3');
+    });
+  }
+  function copyAllMsgNtt() {
+    var d = buildMsgNttData();
+    var all = 'tin nhắn 1\n' + d.msg1 + '\n\ntin nhắn 2\n' + d.msg2 + '\n\ntin nhắn 3\n' + d.msg3;
+    copyPlainText(all, 'toàn bộ 3 tin nhắn');
+  }
+  var btnCopyMsgNttAll = $('#btn-copy-msg-ntt-all');
+  if (btnCopyMsgNttAll) btnCopyMsgNttAll.addEventListener('click', copyAllMsgNtt);
+  var btnCopyMsgNttAllTop = $('#btn-copy-msg-ntt-all-top');
+  if (btnCopyMsgNttAllTop) btnCopyMsgNttAllTop.addEventListener('click', copyAllMsgNtt);
+
+  // ---- XÂY DỰNG TIN NHẮN NNT (KOL / NGHỆ SĨ) ----
+  var NNT_ROLE_NAMES = {
+    kmdh: 'Khách mời đồng hành',
+    nvtch: 'Nhân vật truyền cảm hứng',
+    dsnh: 'Đại sứ ngày hội',
+  };
+
+  var NNT_LINKS = {
+    kmdh: {
+      thuMoi: 'https://drive.google.com/file/d/1_4uVHJusoJql_udP1bY7ab-nz16W9cQ1/view?usp=sharing',
+      quyenLoi: 'https://drive.google.com/file/d/1dep2tzmFN3RhE9uFaTVJs-aZ98ly-kbM/view?usp=sharing',
+      timeline: 'https://drive.google.com/file/d/15PlET4zPO7aeFcRZ3C4No14PLPuotsMY/view?usp=sharing',
+    },
+    nvtch: {
+      thuMoi: 'https://drive.google.com/file/d/1J7UleXoM5ztNxuBo9mEzUMVwz7vt0aKt/view?usp=sharing',
+      quyenLoi: 'https://drive.google.com/file/d/1dep2tzmFN3RhE9uFaTVJs-aZ98ly-kbM/view?usp=sharing',
+      timeline: 'https://drive.google.com/file/d/15PlET4zPO7aeFcRZ3C4No14PLPuotsMY/view?usp=sharing',
+    },
+    dsnh: {
+      thuMoi: 'https://drive.google.com/file/d/1AGF15VX4-Hzf-fP4KdEa3mLUIwE8_51v/view?usp=sharing',
+      quyenLoi: 'https://drive.google.com/file/d/1dep2tzmFN3RhE9uFaTVJs-aZ98ly-kbM/view?usp=sharing',
+      timeline: 'https://drive.google.com/file/d/15PlET4zPO7aeFcRZ3C4No14PLPuotsMY/view?usp=sharing',
+    },
+  };
+
+  function getXungHoText(val) {
+    if (val === 'anh chị') return { lower: 'anh/chị', cap: 'Anh/Chị' };
+    if (val === 'chị') return { lower: 'chị', cap: 'Chị' };
+    if (val === 'cô') return { lower: 'cô', cap: 'Cô' };
+    if (val === 'chú') return { lower: 'chú', cap: 'Chú' };
+    if (val === 'band') return { lower: 'band', cap: 'Band' };
+    return { lower: 'anh', cap: 'Anh' };
+  }
+
+  function getTuGoiText(val) {
+    if (val === 'con') return { lower: 'con', cap: 'Con', chung: 'chúng con' };
+    if (val === 'cháu') return { lower: 'cháu', cap: 'Cháu', chung: 'chúng cháu' };
+    return { lower: 'em', cap: 'Em', chung: 'chúng em' };
+  }
+
+  function buildMsgNntData() {
+    var ten = (msgNntState.hoTen || '').trim();
+    var ngheDanh = (msgNntState.ngheDanh || '').trim();
+    var ngayFmt = F.formatDate(msgNntState.ngay);
+    var xh = getXungHoText(msgNntState.xungHo);
+    var tg = getTuGoiText(msgNntState.tuGoi);
+    var cuongVi = NNT_ROLE_NAMES[msgNntState.type] || 'Khách mời đồng hành';
+    var links = NNT_LINKS[msgNntState.type] || NNT_LINKS.kmdh;
+
+    var targetName = ngheDanh ? (xh.lower + ' ' + ngheDanh) : ('[' + xh.lower + '] [Nghệ danh/tên]');
+
+    var msg1 = 'Dạ ' + tg.lower + ' chào ' + targetName + ' ạ. ' + tg.cap + ' là ' + (ten || '[Tên]') + ', phụ trách Đối ngoại Ngày hội hiến máu Sắc Hồng Hy Vọng lần thứ XXVII của Trường ĐH Công nghệ - ĐHQGHN ạ.';
+
+    var msg2 = 'Dạ ' + tg.chung + ' có theo dõi những chia sẻ của ' + xh.lower + ' và nhận thấy ' + xh.lower + ' là người có sức ảnh hưởng, truyền được rất nhiều năng lượng tích cực cho các bạn trẻ ạ. Vì vậy ' + tg.chung + ' xin phép mời ' + xh.lower + ' đồng hành cùng Sắc Hồng Hy Vọng lần này với cương vị ' + cuongVi + ' ạ!\n\n' +
+      'Sắc Hồng Hy Vọng là ngày hội hiến máu toàn trường lớn nhất trong các trường thuộc ĐHQGHN, do CLB Sinh viên vận động hiến máu Trường ĐH Công nghệ tổ chức cùng Viện Huyết học - Truyền máu Trung ương. Năm nay là lần thứ XXVII, với thông điệp "Thanh niên Việt Nam - Sẵn sàng hiến máu". Chương trình không chỉ để các bạn sinh viên hiến máu cứu người mà còn là nơi các bạn được rèn luyện, trải nghiệm và trưởng thành qua hoạt động tình nguyện ạ.\n\n' +
+      'Ngày hội diễn ra:\n' +
+      '- 7h30 – 16h30, thứ Hai 30/11/2026\n' +
+      '- Tầng 2 tòa đa năng, ĐH Công nghệ - ĐHQGHN (cơ sở Hòa Lạc)\n\n' +
+      'Chúng ' + tg.lower + ' tin rằng có sự đồng hành của ' + xh.lower + ', chương trình sẽ đến gần hơn với nhiều người, nhất là giới trẻ ạ. Nếu tiện, ' + xh.lower + ' có thể tới tham dự hoặc chia sẻ về chương trình trên Fanpage giúp bên ' + tg.lower + ' nhé.';
+
+    if (msgNntState.kemLink) {
+      msg2 += '\n\n' + xh.cap + ' xem giúp ' + tg.lower + ' thông tin chi tiết và quyền lợi tại đây ạ:\n' +
+        '📄 Thư mời ' + cuongVi + ': ' + links.thuMoi + '\n' +
+        '📄 Công việc và Quyền lợi: ' + links.quyenLoi + '\n' +
+        '📄 Timeline ngày hội: ' + links.timeline;
+    }
+
+    var msg3 = 'Chúng ' + tg.lower + ' mong nhận được phản hồi trước ngày ' + (ngayFmt || '[../../2026]') + ' ạ. Cần thêm thông tin ' + xh.lower + ' nhắn ' + tg.lower + ' nhé. ' + tg.cap + ' cảm ơn ' + xh.lower + ' ạ';
+
+    return { msg1: msg1, msg2: msg2, msg3: msg3 };
+  }
+
+  function renderMsgNnt() {
+    var data = buildMsgNntData();
+    var p1 = $('#preview-msg-nnt-1');
+    var p2 = $('#preview-msg-nnt-2');
+    var p3 = $('#preview-msg-nnt-3');
+    if (p1) p1.innerHTML = formatMsgPreviewHtml(data.msg1);
+    if (p2) p2.innerHTML = formatMsgPreviewHtml(data.msg2);
+    if (p3) p3.innerHTML = formatMsgPreviewHtml(data.msg3);
+  }
+
+  if (msgNntTypeGroup) {
+    msgNntTypeGroup.addEventListener('click', function (e) {
+      var btn = e.target.closest('.seg');
+      if (!btn) return;
+      msgNntState.type = btn.dataset.type;
+      Array.prototype.forEach.call(msgNntTypeGroup.querySelectorAll('.seg'), function (s) {
+        s.setAttribute('aria-pressed', String(s === btn));
+      });
+      renderMsgNnt();
+    });
+  }
+
+  if (msgNntInputs.ngheDanh) {
+    msgNntInputs.ngheDanh.addEventListener('input', function () {
+      msgNntState.ngheDanh = msgNntInputs.ngheDanh.value;
+      renderMsgNnt();
+    });
+  }
+  if (msgNntInputs.hoTen) {
+    msgNntInputs.hoTen.addEventListener('input', function () {
+      msgNntState.hoTen = msgNntInputs.hoTen.value;
+      saveSender({ hoTen: msgNntState.hoTen });
+      renderMsgNnt();
+    });
+  }
+  if (msgNntInputs.ngay) {
+    msgNntInputs.ngay.addEventListener('input', function () {
+      msgNntState.ngay = msgNntInputs.ngay.value;
+      saveSender({ ngay: msgNntState.ngay });
+      renderMsgNnt();
+    });
+  }
+  if (msgNntInputs.kemLink) {
+    msgNntInputs.kemLink.addEventListener('change', function () {
+      msgNntState.kemLink = msgNntInputs.kemLink.checked;
+      renderMsgNnt();
+    });
+  }
+
+  document.querySelectorAll('input[name="msgNntXungHo"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      if (radio.checked) { msgNntState.xungHo = radio.value; renderMsgNnt(); }
+    });
+  });
+
+  document.querySelectorAll('input[name="msgNntTuGoi"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      if (radio.checked) { msgNntState.tuGoi = radio.value; renderMsgNnt(); }
+    });
+  });
+
+  var btnCopyMsgNnt1 = $('#btn-copy-msg-nnt-1');
+  if (btnCopyMsgNnt1) {
+    btnCopyMsgNnt1.addEventListener('click', function () {
+      copyPlainText(buildMsgNntData().msg1, 'tin nhắn 1');
+    });
+  }
+  var btnCopyMsgNnt2 = $('#btn-copy-msg-nnt-2');
+  if (btnCopyMsgNnt2) {
+    btnCopyMsgNnt2.addEventListener('click', function () {
+      copyPlainText(buildMsgNntData().msg2, 'tin nhắn 2');
+    });
+  }
+  var btnCopyMsgNnt3 = $('#btn-copy-msg-nnt-3');
+  if (btnCopyMsgNnt3) {
+    btnCopyMsgNnt3.addEventListener('click', function () {
+      copyPlainText(buildMsgNntData().msg3, 'tin nhắn 3');
+    });
+  }
+  function copyAllMsgNnt() {
+    var d = buildMsgNntData();
+    var all = 'tin nhắn 1\n' + d.msg1 + '\n\ntin nhắn 2\n' + d.msg2 + '\n\ntin nhắn 3\n' + d.msg3;
+    copyPlainText(all, 'toàn bộ 3 tin nhắn');
+  }
+  var btnCopyMsgNntAll = $('#btn-copy-msg-nnt-all');
+  if (btnCopyMsgNntAll) btnCopyMsgNntAll.addEventListener('click', copyAllMsgNnt);
+  var btnCopyMsgNntAllTop = $('#btn-copy-msg-nnt-all-top');
+  if (btnCopyMsgNntAllTop) btnCopyMsgNntAllTop.addEventListener('click', copyAllMsgNnt);
+
   // ---- Khởi động ----
   loadSender();
   renderSubjects();
@@ -619,4 +921,6 @@
   camonFlow.render();
   nttFlow.render();
   btttFlow.render();
+  renderMsgNtt();
+  renderMsgNnt();
 })();

@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SH27 · Tạo thư mời KOL</title>
+<title>SH27 · Thư mời &amp; Tin nhắn Đối ngoại</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="topbar">
-  <h1>SH27 · Tạo thư mời KOL</h1>
+  <h1>SH27 · Thư mời &amp; Tin nhắn Đối ngoại</h1>
   <p class="sub">Ngày hội hiến máu Sắc Hồng Hy Vọng lần thứ XXVII — Ban Đối ngoại</p>
 </header>
 
@@ -16,16 +16,25 @@
   Chưa build template. Chạy: <code>node scripts/build-templates.mjs</code>
 </div>
 
-<nav class="tabs" aria-label="Chức năng">
-  <button type="button" class="tab" data-tab="invite" aria-selected="true">Thư mời</button>
-  <button type="button" class="tab" data-tab="subject" aria-selected="false">Chủ đề email</button>
-  <button type="button" class="tab" data-tab="httt" aria-selected="false">Mail trả lời khi bị từ chối &amp; ngỏ lời HTTT</button>
-  <button type="button" class="tab" data-tab="httt-ns" aria-selected="false">Mail HTTT gửi thẳng nghệ sĩ</button>
-  <button type="button" class="tab" data-tab="cam-on" aria-selected="false">Chỉ cảm ơn KOL/KOC</button>
-  <button type="button" class="tab" data-tab="ntt" aria-selected="false">Thư mời Nhà tài trợ</button>
-  <button type="button" class="tab" data-tab="bttt" aria-selected="false">Thư mời Bảo trợ truyền thông</button>
-</nav>
+<div class="app-container">
+  <aside class="sidebar">
+    <nav class="tabs" aria-label="Chức năng">
+      <div class="nav-section-title">Thư mời Email</div>
+      <button type="button" class="tab" data-tab="invite" aria-selected="true"><span class="tab-icon">✉️</span> Thư mời KOL</button>
+      <button type="button" class="tab" data-tab="subject" aria-selected="false"><span class="tab-icon">🏷️</span> Chủ đề email</button>
+      <button type="button" class="tab" data-tab="ntt" aria-selected="false"><span class="tab-icon">🤝</span> Thư mời Nhà tài trợ</button>
+      <button type="button" class="tab" data-tab="bttt" aria-selected="false"><span class="tab-icon">📢</span> Thư mời Bảo trợ truyền thông</button>
+      <button type="button" class="tab" data-tab="httt" aria-selected="false"><span class="tab-icon">↩️</span> Mail từ chối &amp; ngỏ lời HTTT</button>
+      <button type="button" class="tab" data-tab="httt-ns" aria-selected="false"><span class="tab-icon">📩</span> Mail HTTT gửi thẳng NS</button>
+      <button type="button" class="tab" data-tab="cam-on" aria-selected="false"><span class="tab-icon">🙏</span> Chỉ cảm ơn KOL/KOC</button>
 
+      <div class="nav-section-title">Tin nhắn Zalo / Facebook</div>
+      <button type="button" class="tab" data-tab="msg-ntt" aria-selected="false"><span class="tab-icon">💬</span> Nhắn Zalo/FB — NTT</button>
+      <button type="button" class="tab" data-tab="msg-nnt" aria-selected="false"><span class="tab-icon">💬</span> Nhắn Zalo/FB — NNT</button>
+    </nav>
+  </aside>
+
+  <div class="content-area">
 <main class="layout" id="tab-invite">
   <section class="panel form-panel">
     <div class="field">
@@ -503,6 +512,187 @@
     </div>
   </section>
 </main>
+
+<main class="layout" id="tab-msg-ntt" hidden>
+  <section class="panel form-panel">
+    <div class="field">
+      <label class="label" for="f-msg-ntt-donVi">Tên đơn vị / Nhà tài trợ <em>*</em></label>
+      <input id="f-msg-ntt-donVi" type="text" maxlength="120" placeholder="Ví dụ: Công ty TNHH ABC">
+      <p class="err" data-err-msg-ntt="donVi"></p>
+    </div>
+
+    <hr class="divider">
+    <p class="section-title">Người gửi</p>
+
+    <div class="field">
+      <label class="label" for="f-msg-ntt-hoTen">Tên của bạn [Tên] <em>*</em></label>
+      <input id="f-msg-ntt-hoTen" type="text" maxlength="80" placeholder="Ví dụ: Hải Anh">
+      <p class="hint" style="color:var(--muted);">Điền vào chỗ: "Em là <strong>[Tên]</strong>, phụ trách Đối ngoại..."</p>
+      <p class="err" data-err-msg-ntt="hoTen"></p>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f-msg-ntt-ngay">Ngày hồi âm <em>*</em></label>
+      <input id="f-msg-ntt-ngay" type="date">
+      <p class="err" data-err-msg-ntt="ngay"></p>
+    </div>
+
+    <div class="actions">
+      <button id="btn-copy-msg-ntt-all" type="button" class="btn primary">Sao chép toàn bộ (1, 2 &amp; 3)</button>
+    </div>
+  </section>
+
+  <section class="panel preview-panel">
+    <div class="preview-head">
+      <h2>Xem trước tin nhắn Zalo / Facebook (Nhà tài trợ)</h2>
+      <button id="btn-copy-msg-ntt-all-top" type="button" class="btn small">Sao chép tất cả</button>
+    </div>
+
+    <div class="msg-preview-list">
+      <!-- Tin nhắn 1 -->
+      <div class="msg-card">
+        <div class="msg-card-head">
+          <span class="msg-card-title"><span class="msg-badge">Tin nhắn 1</span> Lời chào &amp; Giới thiệu</span>
+          <button type="button" class="btn small" id="btn-copy-msg-ntt-1">Sao chép tin 1</button>
+        </div>
+        <div class="msg-card-body" id="preview-msg-ntt-1"></div>
+      </div>
+
+      <!-- Tin nhắn 2 -->
+      <div class="msg-card">
+        <div class="msg-card-head">
+          <span class="msg-card-title"><span class="msg-badge">Tin nhắn 2</span> Lời mời &amp; Hồ sơ tài trợ</span>
+          <button type="button" class="btn small" id="btn-copy-msg-ntt-2">Sao chép tin 2</button>
+        </div>
+        <div class="msg-card-body" id="preview-msg-ntt-2"></div>
+      </div>
+
+      <!-- Tin nhắn 3 -->
+      <div class="msg-card">
+        <div class="msg-card-head">
+          <span class="msg-card-title"><span class="msg-badge">Tin nhắn 3</span> Hạn phản hồi &amp; Cảm ơn</span>
+          <button type="button" class="btn small" id="btn-copy-msg-ntt-3">Sao chép tin 3</button>
+        </div>
+        <div class="msg-card-body" id="preview-msg-ntt-3"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<main class="layout" id="tab-msg-nnt" hidden>
+  <section class="panel form-panel">
+    <div class="field">
+      <span class="label">Cương vị mời <em>*</em></span>
+      <div class="segmented" id="msg-nnt-type-group" role="radiogroup" aria-label="Cương vị mời">
+        <button type="button" class="seg" data-type="kmdh" aria-pressed="true">
+          <span class="seg-code">KMDH</span>
+          <span class="seg-name">Khách mời đồng hành</span>
+        </button>
+        <button type="button" class="seg" data-type="nvtch" aria-pressed="false">
+          <span class="seg-code">NVTCH</span>
+          <span class="seg-name">Nhân vật truyền cảm hứng</span>
+        </button>
+        <button type="button" class="seg" data-type="dsnh" aria-pressed="false">
+          <span class="seg-code">ĐSNH</span>
+          <span class="seg-name">Đại sứ ngày hội</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f-msg-nnt-ngheDanh">Nghệ danh / Tên KOL / Nghệ sĩ <em>*</em></label>
+      <input id="f-msg-nnt-ngheDanh" type="text" maxlength="80" placeholder="Ví dụ: Hà Anh Tuấn, Tun Phạm...">
+      <p class="err" data-err-msg-nnt="ngheDanh"></p>
+    </div>
+
+    <div class="field">
+      <span class="label">Xưng hô với nghệ sĩ [anh/chị] <em>*</em></span>
+      <div class="radio-row">
+        <label><input type="radio" name="msgNntXungHo" value="anh" checked> Anh</label>
+        <label><input type="radio" name="msgNntXungHo" value="chị"> Chị</label>
+        <label><input type="radio" name="msgNntXungHo" value="cô"> Cô</label>
+        <label><input type="radio" name="msgNntXungHo" value="chú"> Chú</label>
+        <label><input type="radio" name="msgNntXungHo" value="anh chị"> Anh Chị</label>
+        <label><input type="radio" name="msgNntXungHo" value="band"> Band</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="label">Tự xưng là <em>*</em></span>
+      <div class="radio-row">
+        <label><input type="radio" name="msgNntTuGoi" value="em" checked> Em</label>
+        <label><input type="radio" name="msgNntTuGoi" value="con"> Con</label>
+        <label><input type="radio" name="msgNntTuGoi" value="cháu"> Cháu</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="checkbox-label">
+        <input type="checkbox" id="f-msg-nnt-kemLink" checked>
+        <span>Kèm đường dẫn Thư mời, Timeline &amp; Quyền lợi trong tin nhắn 2</span>
+      </label>
+    </div>
+
+    <hr class="divider">
+    <p class="section-title">Người gửi</p>
+
+    <div class="field">
+      <label class="label" for="f-msg-nnt-hoTen">Tên của bạn [Tên] <em>*</em></label>
+      <input id="f-msg-nnt-hoTen" type="text" maxlength="80" placeholder="Ví dụ: Hải Anh">
+      <p class="hint" style="color:var(--muted);">Điền vào chỗ: "Em là <strong>[Tên]</strong>, phụ trách Đối ngoại..."</p>
+      <p class="err" data-err-msg-nnt="hoTen"></p>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f-msg-nnt-ngay">Ngày hồi âm <em>*</em></label>
+      <input id="f-msg-nnt-ngay" type="date">
+      <p class="err" data-err-msg-nnt="ngay"></p>
+    </div>
+
+    <div class="actions">
+      <button id="btn-copy-msg-nnt-all" type="button" class="btn primary">Sao chép toàn bộ (1, 2 &amp; 3)</button>
+    </div>
+  </section>
+
+  <section class="panel preview-panel">
+    <div class="preview-head">
+      <h2>Xem trước tin nhắn Zalo / Facebook (Người nổi tiếng)</h2>
+      <button id="btn-copy-msg-nnt-all-top" type="button" class="btn small">Sao chép tất cả</button>
+    </div>
+
+    <div class="msg-preview-list">
+      <!-- Tin nhắn 1 -->
+      <div class="msg-card">
+        <div class="msg-card-head">
+          <span class="msg-card-title"><span class="msg-badge">Tin nhắn 1</span> Lời chào &amp; Giới thiệu</span>
+          <button type="button" class="btn small" id="btn-copy-msg-nnt-1">Sao chép tin 1</button>
+        </div>
+        <div class="msg-card-body" id="preview-msg-nnt-1"></div>
+      </div>
+
+      <!-- Tin nhắn 2 -->
+      <div class="msg-card">
+        <div class="msg-card-head">
+          <span class="msg-card-title"><span class="msg-badge">Tin nhắn 2</span> Lời mời hợp tác &amp; Giới thiệu ngày hội</span>
+          <button type="button" class="btn small" id="btn-copy-msg-nnt-2">Sao chép tin 2</button>
+        </div>
+        <div class="msg-card-body" id="preview-msg-nnt-2"></div>
+      </div>
+
+      <!-- Tin nhắn 3 -->
+      <div class="msg-card">
+        <div class="msg-card-head">
+          <span class="msg-card-title"><span class="msg-badge">Tin nhắn 3</span> Hạn phản hồi &amp; Cảm ơn</span>
+          <button type="button" class="btn small" id="btn-copy-msg-nnt-3">Sao chép tin 3</button>
+        </div>
+        <div class="msg-card-body" id="preview-msg-nnt-3"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+  </div><!-- /.content-area -->
+</div><!-- /.app-container -->
 
 <div id="toast" class="toast" hidden>Đã sao chép</div>
 
