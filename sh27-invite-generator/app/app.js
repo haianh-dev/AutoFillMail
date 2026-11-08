@@ -35,9 +35,10 @@
   var nttState = { nhaTaiTro: '', demTen: '', ngay: '', hoTen: '' };
   var btttState = { donViBttt: '', demTen: '', ngay: '', hoTen: '' };
 
-  // ---- Trạng thái tab Nhắn Zalo / FB (NTT & NNT) ----
+  // ---- Trạng thái tab Nhắn Zalo / FB (NTT, NNT & Quản lý NS) ----
   var msgNttState = { donVi: '', hoTen: '', ngay: '' };
   var msgNntState = { type: 'kmdh', ngheDanh: '', xungHo: 'anh', tuGoi: 'em', kemLink: true, hoTen: '', ngay: '' };
+  var msgQlState = { type: 'kmdh', xungHoQL: 'anh', tenQl: '', ngheDanh: '', xungHoNS: 'anh', tuGoi: 'em', kemLink: true, hoTen: '', ngay: '' };
 
   // ---- Phần tử DOM ----
   var $ = function (sel) { return document.querySelector(sel); };
@@ -88,6 +89,8 @@
         if (msgNttInputs.hoTen) msgNttInputs.hoTen.value = saved.hoTen;
         msgNntState.hoTen = saved.hoTen;
         if (msgNntInputs.hoTen) msgNntInputs.hoTen.value = saved.hoTen;
+        msgQlState.hoTen = saved.hoTen;
+        if (msgQlInputs.hoTen) msgQlInputs.hoTen.value = saved.hoTen;
       }
       if (saved.demTen) {
         values.demTen = saved.demTen; inputs.demTen.value = saved.demTen; demTenTouched = true;
@@ -106,6 +109,8 @@
         if (msgNttInputs.ngay) msgNttInputs.ngay.value = saved.ngay;
         msgNntState.ngay = saved.ngay;
         if (msgNntInputs.ngay) msgNntInputs.ngay.value = saved.ngay;
+        msgQlState.ngay = saved.ngay;
+        if (msgQlInputs.ngay) msgQlInputs.ngay.value = saved.ngay;
       }
     } catch (e) { /* localStorage có thể bị chặn — bỏ qua */ }
   }
@@ -224,7 +229,7 @@
   });
 
   // ---- Chuyển tab ----
-  var ALL_TABS = ['invite', 'subject', 'httt', 'httt-ns', 'cam-on', 'ntt', 'bttt', 'msg-ntt', 'msg-nnt'];
+  var ALL_TABS = ['invite', 'subject', 'httt', 'httt-ns', 'cam-on', 'ntt', 'bttt', 'msg-ntt', 'msg-nnt', 'msg-ql'];
   Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (tab) {
     tab.addEventListener('click', function () {
       Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (t) {
@@ -249,6 +254,16 @@
           msgNntInputs.ngheDanh.value = values.ngheDanh;
           renderMsgNnt();
         }
+      } else if (curTab === 'msg-ql') {
+        if (!msgQlState.tenQl && htttState.quanLy) {
+          msgQlState.tenQl = htttState.quanLy;
+          if (msgQlInputs.tenQl) msgQlInputs.tenQl.value = htttState.quanLy;
+        }
+        if (!msgQlState.ngheDanh && (values.ngheDanh || htttState.nntTen || msgNntState.ngheDanh)) {
+          msgQlState.ngheDanh = values.ngheDanh || htttState.nntTen || msgNntState.ngheDanh;
+          if (msgQlInputs.ngheDanh) msgQlInputs.ngheDanh.value = msgQlState.ngheDanh;
+        }
+        renderMsgQl();
       }
     });
   });
@@ -910,6 +925,160 @@
   var btnCopyMsgNntAllTop = $('#btn-copy-msg-nnt-all-top');
   if (btnCopyMsgNntAllTop) btnCopyMsgNntAllTop.addEventListener('click', copyAllMsgNnt);
 
+  // ---- XÂY DỰNG TIN NHẮN QUẢN LÝ NGHỆ SĨ ----
+  var msgQlInputs = {
+    tenQl: $('#f-msg-ql-tenQl'),
+    ngheDanh: $('#f-msg-ql-ngheDanh'),
+    hoTen: $('#f-msg-ql-hoTen'),
+    ngay: $('#f-msg-ql-ngay'),
+    kemLink: $('#f-msg-ql-kemLink'),
+  };
+  var msgQlTypeGroup = $('#msg-ql-type-group');
+
+  function getXungHoNs3rdText(val) {
+    if (val === 'chị') return { lower: 'chị', cap: 'Chị' };
+    if (val === 'bạn ấy') return { lower: 'bạn ấy', cap: 'Bạn ấy' };
+    if (val === 'nghệ sĩ') return { lower: 'nghệ sĩ', cap: 'Nghệ sĩ' };
+    return { lower: 'anh', cap: 'Anh' };
+  }
+
+  function buildMsgQlData() {
+    var tenQl = (msgQlState.tenQl || '').trim();
+    var ngheDanh = (msgQlState.ngheDanh || '').trim();
+    var hoTen = (msgQlState.hoTen || '').trim();
+    var ngayFmt = F.formatDate(msgQlState.ngay);
+    var xhQL = getXungHoText(msgQlState.xungHoQL);
+    var xhNS3 = getXungHoNs3rdText(msgQlState.xungHoNS);
+    var tg = getTuGoiText(msgQlState.tuGoi);
+    var cuongVi = NNT_ROLE_NAMES[msgQlState.type] || 'Khách mời đồng hành';
+    var links = NNT_LINKS[msgQlState.type] || NNT_LINKS.kmdh;
+
+    var targetQL = tenQl ? (xhQL.lower + ' ' + tenQl) : ('[' + xhQL.lower + '] [Tên quản lý]');
+    var targetNS = ngheDanh || '[Nghệ danh/tên nghệ sĩ]';
+    var senderName = hoTen || '[Họ và tên của bạn]';
+
+    var msg1 = 'Dạ ' + tg.lower + ' chào ' + targetQL + ' ạ. ' + tg.cap + ' là ' + senderName + ', phụ trách Đối ngoại Ngày hội hiến máu Sắc Hồng Hy Vọng lần thứ XXVII của Trường ĐH Công nghệ - ĐHQGHN ạ. ' + tg.cap + ' xin phép được trao đổi với ' + xhQL.lower + ' về việc mời ' + targetNS + ' đồng hành cùng chương trình ạ.';
+
+    var msg2 = 'Dạ ' + tg.chung + ' có theo dõi những chia sẻ của ' + targetNS + ' và nhận thấy ' + xhNS3.lower + ' là người có sức ảnh hưởng, truyền được rất nhiều năng lượng tích cực đến các bạn trẻ ạ. Vì vậy ' + tg.chung + ' xin phép gửi lời mời ' + targetNS + ' đồng hành cùng Sắc Hồng Hy Vọng lần này với cương vị ' + cuongVi + ', và mong ' + xhQL.lower + ' hỗ trợ chuyển lời mời tới nghệ sĩ giúp ' + tg.chung + ' ạ.\n\n' +
+      'Sắc Hồng Hy Vọng là ngày hội hiến máu toàn trường lớn nhất trong các trường thuộc ĐHQGHN, do CLB Sinh viên vận động hiến máu Trường ĐH Công nghệ tổ chức cùng Viện Huyết học - Truyền máu Trung ương. Năm nay là lần thứ XXVII, với thông điệp "Thanh niên Việt Nam - Sẵn sàng hiến máu". Chương trình không chỉ để các bạn sinh viên hiến máu cứu người mà còn là nơi các bạn được rèn luyện, trải nghiệm và trưởng thành qua hoạt động tình nguyện ạ.\n\n' +
+      'Ngày hội diễn ra:\n' +
+      '- 7h30 – 16h30, thứ Hai 30/11/2026\n' +
+      '- Tầng 2 tòa đa năng, ĐH Công nghệ - ĐHQGHN (cơ sở Hòa Lạc)\n\n' +
+      'Chúng ' + tg.lower + ' tin rằng có sự đồng hành của nghệ sĩ, chương trình sẽ đến gần hơn với nhiều người, nhất là giới trẻ ạ. Nếu lịch trình phù hợp, nghệ sĩ có thể tới tham dự hoặc chia sẻ về chương trình trên Fanpage giúp bên ' + tg.lower + ' nhé.';
+
+    if (msgQlState.kemLink) {
+      msg2 += '\n\n' + xhQL.cap + ' xem giúp ' + tg.lower + ' thông tin chi tiết và quyền lợi tại đây ạ:\n' +
+        '📄 Thư mời ' + cuongVi + ': ' + links.thuMoi + '\n' +
+        '📄 Công việc và Quyền lợi: ' + links.quyenLoi + '\n' +
+        '📄 Timeline ngày hội: ' + links.timeline;
+    }
+
+    var msg3 = 'Chúng ' + tg.lower + ' mong nhận được phản hồi từ ' + xhQL.lower + ' trước ngày ' + (ngayFmt || '[../../2026]') + ' ạ. Nếu cần thêm thông tin về lịch trình, hình thức tham gia hay các yêu cầu từ phía nghệ sĩ, ' + xhQL.lower + ' nhắn ' + tg.lower + ' để bên ' + tg.lower + ' phối hợp nhé ạ. ' + tg.cap + ' cảm ơn ' + xhQL.lower + ' nhiều ạ!';
+
+    return { msg1: msg1, msg2: msg2, msg3: msg3 };
+  }
+
+  function renderMsgQl() {
+    var data = buildMsgQlData();
+    var p1 = $('#preview-msg-ql-1');
+    var p2 = $('#preview-msg-ql-2');
+    var p3 = $('#preview-msg-ql-3');
+    if (p1) p1.innerHTML = formatMsgPreviewHtml(data.msg1);
+    if (p2) p2.innerHTML = formatMsgPreviewHtml(data.msg2);
+    if (p3) p3.innerHTML = formatMsgPreviewHtml(data.msg3);
+  }
+
+  if (msgQlTypeGroup) {
+    msgQlTypeGroup.addEventListener('click', function (e) {
+      var btn = e.target.closest('.seg');
+      if (!btn) return;
+      msgQlState.type = btn.dataset.type;
+      Array.prototype.forEach.call(msgQlTypeGroup.querySelectorAll('.seg'), function (s) {
+        s.setAttribute('aria-pressed', String(s === btn));
+      });
+      renderMsgQl();
+    });
+  }
+
+  if (msgQlInputs.tenQl) {
+    msgQlInputs.tenQl.addEventListener('input', function () {
+      msgQlState.tenQl = msgQlInputs.tenQl.value;
+      renderMsgQl();
+    });
+  }
+  if (msgQlInputs.ngheDanh) {
+    msgQlInputs.ngheDanh.addEventListener('input', function () {
+      msgQlState.ngheDanh = msgQlInputs.ngheDanh.value;
+      renderMsgQl();
+    });
+  }
+  if (msgQlInputs.hoTen) {
+    msgQlInputs.hoTen.addEventListener('input', function () {
+      msgQlState.hoTen = msgQlInputs.hoTen.value;
+      saveSender({ hoTen: msgQlState.hoTen });
+      renderMsgQl();
+    });
+  }
+  if (msgQlInputs.ngay) {
+    msgQlInputs.ngay.addEventListener('input', function () {
+      msgQlState.ngay = msgQlInputs.ngay.value;
+      saveSender({ ngay: msgQlState.ngay });
+      renderMsgQl();
+    });
+  }
+  if (msgQlInputs.kemLink) {
+    msgQlInputs.kemLink.addEventListener('change', function () {
+      msgQlState.kemLink = msgQlInputs.kemLink.checked;
+      renderMsgQl();
+    });
+  }
+
+  document.querySelectorAll('input[name="msgQlXungHo"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      if (radio.checked) { msgQlState.xungHoQL = radio.value; renderMsgQl(); }
+    });
+  });
+
+  document.querySelectorAll('input[name="msgQlXungHoNs"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      if (radio.checked) { msgQlState.xungHoNS = radio.value; renderMsgQl(); }
+    });
+  });
+
+  document.querySelectorAll('input[name="msgQlTuGoi"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      if (radio.checked) { msgQlState.tuGoi = radio.value; renderMsgQl(); }
+    });
+  });
+
+  var btnCopyMsgQl1 = $('#btn-copy-msg-ql-1');
+  if (btnCopyMsgQl1) {
+    btnCopyMsgQl1.addEventListener('click', function () {
+      copyPlainText(buildMsgQlData().msg1, 'tin nhắn 1');
+    });
+  }
+  var btnCopyMsgQl2 = $('#btn-copy-msg-ql-2');
+  if (btnCopyMsgQl2) {
+    btnCopyMsgQl2.addEventListener('click', function () {
+      copyPlainText(buildMsgQlData().msg2, 'tin nhắn 2');
+    });
+  }
+  var btnCopyMsgQl3 = $('#btn-copy-msg-ql-3');
+  if (btnCopyMsgQl3) {
+    btnCopyMsgQl3.addEventListener('click', function () {
+      copyPlainText(buildMsgQlData().msg3, 'tin nhắn 3');
+    });
+  }
+  function copyAllMsgQl() {
+    var d = buildMsgQlData();
+    var all = 'tin nhắn 1\n' + d.msg1 + '\n\ntin nhắn 2\n' + d.msg2 + '\n\ntin nhắn 3\n' + d.msg3;
+    copyPlainText(all, 'toàn bộ 3 tin nhắn');
+  }
+  var btnCopyMsgQlAll = $('#btn-copy-msg-ql-all');
+  if (btnCopyMsgQlAll) btnCopyMsgQlAll.addEventListener('click', copyAllMsgQl);
+  var btnCopyMsgQlAllTop = $('#btn-copy-msg-ql-all-top');
+  if (btnCopyMsgQlAllTop) btnCopyMsgQlAllTop.addEventListener('click', copyAllMsgQl);
+
   // ---- Khởi động ----
   loadSender();
   renderSubjects();
@@ -923,4 +1092,5 @@
   btttFlow.render();
   renderMsgNtt();
   renderMsgNnt();
+  renderMsgQl();
 })();
