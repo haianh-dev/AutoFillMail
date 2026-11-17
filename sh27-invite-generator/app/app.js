@@ -39,7 +39,7 @@
   var msgNttState = { donVi: '', hoTen: '', ngay: '' };
   var msgNntState = { type: 'kmdh', ngheDanh: '', xungHo: 'anh', tuGoi: 'em', kemLink: true, hoTen: '', ngay: '' };
   var msgQlState = { type: 'kmdh', xungHoQL: 'anh', tenQl: '', ngheDanh: '', xungHoNS: 'anh', tuGoi: 'em', kemLink: true, hoTen: '', ngay: '' };
-  var msgHmttState = { donVi: '', hoTen: '', ngay: '', linkThuMoi: '', linkDangKy: '', lienHe: 'Ms. Thanh Huyền (0335401260)' };
+  var msgHmttState = { donVi: '', hoTen: '', ngay: '', kemLink: true };
 
   // ---- Phần tử DOM ----
   var $ = function (sel) { return document.querySelector(sel); };
@@ -681,9 +681,7 @@
     donVi: $('#f-msg-hmtt-donVi'),
     hoTen: $('#f-msg-hmtt-hoTen'),
     ngay: $('#f-msg-hmtt-ngay'),
-    linkThuMoi: $('#f-msg-hmtt-linkThuMoi'),
-    linkDangKy: $('#f-msg-hmtt-linkDangKy'),
-    lienHe: $('#f-msg-hmtt-lienHe'),
+    kemLink: $('#f-msg-hmtt-kemLink'),
   };
 
   function formatMsgPreviewHtml(rawText) {
@@ -1100,20 +1098,20 @@
   if (btnCopyMsgQlAllTop) btnCopyMsgQlAllTop.addEventListener('click', copyAllMsgQl);
 
   // ---- XÂY DỰNG TIN NHẮN HIẾN MÁU TẬP THỂ (HMTT) ----
-  function buildMsgHmttData() {
-    var donVi = msgHmttState.donVi.trim();
-    var hoTen = msgHmttState.hoTen.trim();
-    var ngay = msgHmttState.ngay.trim();
-    var linkThuMoi = msgHmttState.linkThuMoi.trim();
-    var linkDangKy = msgHmttState.linkDangKy.trim();
-    var lienHe = msgHmttState.lienHe.trim();
+  var HMTT_LINKS = {
+    thuMoi: 'https://drive.google.com/file/d/1tzMOkvVZoMT0RvA7EwoNdr85Isl4Xb9o/view?usp=sharing',
+    dangKy: 'https://docs.google.com/forms/d/e/1FAIpQLScV_h4SwqUjGOimV_l70XQdo3BB6tzox6mDoBrdhWqsZ3LPAw/viewform?usp=send_form',
+  };
 
-    var donViDisp = donVi || '[Tên đơn vị]';
-    var hoTenDisp = hoTen || '[Tên của bạn]';
-    var ngayDisp = ngay ? F.formatDateVN(ngay) : '[../../2026]';
-    var lienHeDisp = lienHe || 'Ms. Thanh Huyền (0335401260)';
-    var thuMoiDisp = linkThuMoi || '[THƯ MỜI]';
-    var dangKyDisp = linkDangKy || '[Link Đăng Ký]';
+  function buildMsgHmttData() {
+    var donVi = (msgHmttState.donVi || '').trim();
+    var hoTen = (msgHmttState.hoTen || '').trim();
+    var ngay = (msgHmttState.ngay || '').trim();
+    var kemLink = msgHmttState.kemLink !== false;
+
+    var donViDisp = donVi || '[...]';
+    var hoTenDisp = hoTen || '[...]';
+    var ngayDisp = ngay ? F.formatDateVN(ngay) : '…';
 
     var msg1 = 'Dear ' + donViDisp + ',\n\n' +
       'Lời đầu tiên, thay mặt Ban Tổ chức xin gửi lời chúc sức khỏe và lời chào trân trọng nhất đến ' + donViDisp + '.\n\n' +
@@ -1122,16 +1120,21 @@
     var msg2 = 'Qua tìm hiểu chi tiết về phương hướng hoạt động và tầm nhìn của ' + donViDisp + ', Sắc Hồng Hy Vọng lần thứ XXVII gửi lời mời hợp tác đến ' + donViDisp + ' với tư cách ĐƠN VỊ HIẾN MÁU TẬP THỂ cho sự kiện.\n\n' +
       'Đôi lời về Ngày hội, Sắc Hồng Hy Vọng lần thứ XXVII được tổ chức bởi CLB Sinh viên vận động hiến máu Trường Đại học Công nghệ, ĐTN - HSV Trường Đại học Công nghệ - ĐHQGHN, BCH Đoàn Đại học Quốc gia Hà Nội phối hợp với Viện Huyết học - Truyền máu Trung ương.\n\n' +
       'Ngày hội hiến máu Sắc Hồng Hy Vọng lần thứ XXVII với thông điệp “Thanh niên Việt Nam - Sẵn sàng hiến máu” không chỉ là cơ hội để những bạn trẻ được rèn luyện sự tự tin, năng động, sáng tạo, tràn đầy nhiệt huyết và đam mê với hoạt động tình nguyện; mà còn là nơi để các bạn trẻ được trải nghiệm và trưởng thành bằng những hành động có ích cho xã hội.\n\n' +
-      'Với tất cả tâm huyết của Ban Tổ chức, mong Quý Đơn vị ghé thăm thư mời ngày hội để hiểu được những tình cảm chân thành của Ban Tổ chức. Đồng thời, Quý Đơn vị có thể đăng ký hiến máu tập thể qua đường link đăng ký hiến máu.\n\n' +
-      '📄 Thư mời: ' + thuMoiDisp + '\n' +
-      '🔗 Link Đăng Ký: ' + dangKyDisp + '\n\n' +
-      'Quý Đơn vị thân mến, sự đồng hành của Quý Đơn vị sẽ là động lực to lớn tiếp thêm sức mạnh cho chúng mình để tạo nên một ngày hội bùng nổ, Sắc Hồng Hy Vọng XXVII luôn sẵn sàng đón tiếp những trái tim yêu thương vào NGÀY CHÍNH HỘI sắp tới đây.';
+      'Với tất cả tâm huyết của Ban Tổ chức, mong Quý Đơn vị ghé thăm thư mời ngày hội để hiểu được những tình cảm chân thành của Ban Tổ chức. Đồng thời, Quý Đơn vị có thể đăng ký hiến máu tập thể qua đường link đăng ký hiến máu.';
 
-    var msg3 = 'Để có thể chuẩn bị tốt nhất cho sự kiện, Ban Tổ chức Sắc Hồng Hy Vọng lần thứ XXVII rất mong nhận được hồi âm từ ' + donViDisp + ' trước ngày ' + ngayDisp + ' ạ.\n\n' +
-      'Quý Đơn vị có thể liên hệ ' + lienHeDisp + ' hoặc phản hồi trực tiếp tin nhắn này để biết thêm thông tin chi tiết.\n\n' +
+    if (kemLink) {
+      msg2 += '\n\n📄 [THƯ MỜI]: ' + HMTT_LINKS.thuMoi + '\n' +
+        '🔗 [Link Đăng Ký]: ' + HMTT_LINKS.dangKy;
+    }
+
+    msg2 += '\n\nQuý Đơn vị thân mến, sự đồng hành của Quý Đơn vị sẽ là động lực to lớn tiếp thêm sức mạnh cho chúng mình để tạo nên một ngày hội bùng nổ, Sắc Hồng Hy Vọng XXVII luôn sẵn sàng đón tiếp những trái tim yêu thương vào NGÀY CHÍNH HỘI sắp tới đây.';
+
+    var msg3 = 'Để có thể chuẩn bị tốt nhất cho sự kiện, Ban Tổ chức Sắc Hồng Hy Vọng lần thứ XXVII rất mong nhận được hồi âm từ ' + donViDisp + ' trước ngày ' + ngayDisp + '.\n\n' +
+      'Quý Đơn vị có thể phản hồi trực tiếp tin nhắn này để biết thêm thông tin chi tiết.\n\n' +
       'Chúc ' + donViDisp + ' có một ngày tốt lành!';
 
-    var msg4 = 'Khi tham gia hiến máu Quý Đơn vị mang theo đầy đủ giấy tờ tùy thân và tuân thủ theo sự hướng dẫn của các y bác sĩ tại điểm. Để rút ngắn thời gian đăng ký và đảm bảo Quý Đơn vị được chăm sóc trước và sau khi tham gia hiến máu, Ban tổ chức lưu ý Quý Đơn vị đăng ký hiến máu trước tại link đăng ký hoặc App hiến máu.';
+    var msg4 = 'Sau khi được phản hồi, nếu đồng ý:\n\n' +
+      'Khi tham gia hiến máu Quý Đơn vị mang theo đầy đủ giấy tờ tùy thân và tuân thủ theo sự hướng dẫn của các y bác sĩ tại điểm. Để rút ngắn thời gian đăng ký và đảm bảo Quý Đơn vị được chăm sóc trước và sau khi tham gia hiến máu, Ban tổ chức lưu ý Quý Đơn vị đăng ký hiến máu trước tại link đăng ký hoặc App hiến máu.';
 
     return {
       msg1: msg1,
@@ -1141,7 +1144,6 @@
       donVi: donVi,
       hoTen: hoTen,
       ngay: ngay,
-      lienHe: lienHe,
     };
   }
 
@@ -1173,10 +1175,6 @@
       var eNg = $('[data-err-msg-hmtt="ngay"]');
       if (eNg) eNg.textContent = 'Vui lòng chọn hạn phản hồi.';
     }
-    if (!d.lienHe) {
-      var eLh = $('[data-err-msg-hmtt="lienHe"]');
-      if (eLh) eLh.textContent = 'Vui lòng nhập thông tin liên hệ.';
-    }
   }
 
   if (msgHmttInputs.donVi) {
@@ -1199,21 +1197,9 @@
       renderMsgHmtt();
     });
   }
-  if (msgHmttInputs.linkThuMoi) {
-    msgHmttInputs.linkThuMoi.addEventListener('input', function () {
-      msgHmttState.linkThuMoi = msgHmttInputs.linkThuMoi.value;
-      renderMsgHmtt();
-    });
-  }
-  if (msgHmttInputs.linkDangKy) {
-    msgHmttInputs.linkDangKy.addEventListener('input', function () {
-      msgHmttState.linkDangKy = msgHmttInputs.linkDangKy.value;
-      renderMsgHmtt();
-    });
-  }
-  if (msgHmttInputs.lienHe) {
-    msgHmttInputs.lienHe.addEventListener('input', function () {
-      msgHmttState.lienHe = msgHmttInputs.lienHe.value;
+  if (msgHmttInputs.kemLink) {
+    msgHmttInputs.kemLink.addEventListener('change', function () {
+      msgHmttState.kemLink = msgHmttInputs.kemLink.checked;
       renderMsgHmtt();
     });
   }
