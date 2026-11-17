@@ -1,108 +1,201 @@
-/* SH27 — giao diện app, tông hồng/đỏ chủ đề hiến máu */
+/* =====================================================================
+   SH27 · NEUBRUTALISM DESIGN SYSTEM
+   Phong cách Neubrutalism / Neo-Brutalism: High Contrast, Hard Shadows,
+   Thick Black Borders, Bold Typography & Vibrant Pop-art Accents.
+   ===================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Space+Grotesk:wght@600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
+
 :root {
-  --brand: #e53e5a;
-  --brand-dark: #c22745;
-  --brand-soft: #fdeef1;
-  --ink: #2d2a2e;
-  --muted: #6f6a70;
-  --line: #e6dfe2;
-  --err: #d93025;
-  --bg: #faf7f8;
+  /* Neubrutalism Color Palette */
+  --bg-cream: #FFFBF0;
+  --bg-white: #FFFFFF;
+  --bg-dark: #000000;
+  
+  /* Pop-art Accent Colors */
+  --pop-yellow: #FFE600;     /* Electric Yellow */
+  --pop-coral: #FF5252;      /* Coral Red / Sắc Hồng Hy Vọng */
+  --pop-blue: #3B82F6;       /* Vibrant Blue */
+  --pop-green: #00E676;      /* Electric Mint Green */
+  --pop-purple: #C084FC;     /* Soft Purple */
+  
+  /* Legacy brand variables mapping */
+  --brand: var(--pop-coral);
+  --brand-dark: #D32F2F;
+  --brand-soft: #FFE5E5;
+  --ink: #000000;
+  --muted: #4B5563;
+  --line: #000000;
+  --err: #D50000;
+  --bg: var(--bg-cream);
+
+  /* Neubrutalism Hard Shadows */
+  --shadow-sm: 2px 2px 0 #000000;
+  --shadow-hard: 4px 4px 0 #000000;
+  --shadow-lg: 6px 6px 0 #000000;
+  --shadow-xl: 8px 8px 0 #000000;
+
+  /* Typography */
+  --font-heading: 'Space Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'Space Mono', Consolas, monospace;
 }
 
 * { box-sizing: border-box; }
 
-/* .layout có display:grid sẽ đè attribute hidden của trình duyệt → ép ẩn lại */
 [hidden] { display: none !important; }
 
+/* =====================================================================
+   BODY & CHECKERED / GRID BACKGROUND
+   ===================================================================== */
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: var(--font-body);
   color: var(--ink);
-  background: var(--bg);
+  background-color: var(--bg-cream);
+  /* Họa tiết lưới caro chìm Neubrutalism */
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
+/* =====================================================================
+   TOPBAR
+   ===================================================================== */
 .topbar {
-  padding: 18px 24px 14px;
-  background: #fff;
-  border-bottom: 1px solid var(--line);
+  padding: 18px 28px;
+  background: var(--bg-cream);
+  border-bottom: 4px solid #000000;
+  box-shadow: 0 4px 0 #000000;
+  position: relative;
+  z-index: 20;
 }
-.topbar h1 { margin: 0; font-size: 20px; color: var(--brand-dark); }
-.topbar .sub { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+
+.topbar h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 900;
+  font-family: var(--font-heading);
+  color: #000000;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  display: inline-block;
+  background: var(--pop-yellow);
+  padding: 4px 12px;
+  border: 3px solid #000000;
+  box-shadow: 3px 3px 0 #000000;
+}
+
+.topbar .sub {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
 .banner-error {
-  margin: 12px 24px;
-  padding: 12px 16px;
-  border: 1px solid var(--err);
-  border-radius: 8px;
-  background: #fdecea;
-  color: var(--err);
+  margin: 16px 28px;
+  padding: 12px 18px;
+  border: 3px solid #000000;
+  background: var(--pop-coral);
+  color: #FFFFFF;
+  font-weight: 700;
   font-size: 14px;
+  box-shadow: var(--shadow-hard);
+}
+.banner-error code {
+  background: #000000;
+  color: #FFFFFF;
+  padding: 2px 6px;
 }
 
+/* =====================================================================
+   APP CONTAINER & NEUBRUTALISM SIDEBAR TABS
+   ===================================================================== */
 .app-container {
   display: flex;
-  min-height: calc(100vh - 65px);
+  min-height: calc(100vh - 88px);
   align-items: stretch;
 }
 
 .sidebar {
-  width: 270px;
+  width: 290px;
   flex-shrink: 0;
-  background: #fff;
-  border-right: 1px solid var(--line);
-  padding: 16px 12px;
+  background: var(--bg-cream);
+  border-right: 4px solid #000000;
+  padding: 20px 14px;
 }
 
 .nav-section-title {
   font-size: 11px;
-  font-weight: 700;
+  font-family: var(--font-heading);
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--muted);
-  padding: 12px 10px 6px;
+  letter-spacing: 0.08em;
+  color: #000000;
+  padding: 14px 8px 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.nav-section-title::before {
+  content: "■";
+  color: var(--pop-coral);
+  font-size: 10px;
 }
 .nav-section-title:first-child {
-  padding-top: 4px;
+  padding-top: 2px;
 }
 
 .tabs {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 8px;
   padding: 0;
   background: transparent;
   border: none;
 }
+
 .tab {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
   text-align: left;
-  padding: 9px 12px;
+  padding: 10px 14px;
   font-size: 13.5px;
-  font-weight: 500;
-  font-family: inherit;
-  color: var(--muted);
-  background: transparent;
-  border: none;
-  border-left: 3px solid transparent;
-  border-radius: 6px;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  color: #000000;
+  background: #FFFFFF;
+  border: 3px solid #000000;
+  border-radius: 0;
   cursor: pointer;
-  line-height: 1.4;
+  line-height: 1.35;
+  box-shadow: var(--shadow-sm);
   transition: all 0.15s ease;
 }
+
 .tab:hover {
-  color: var(--brand-dark);
-  background: var(--brand-soft);
+  background: var(--pop-yellow);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-hard);
 }
+
 .tab[aria-selected="true"] {
-  color: var(--brand-dark);
-  background: var(--brand-soft);
-  font-weight: 600;
-  border-left-color: var(--brand);
+  background: var(--pop-yellow);
+  color: #000000;
+  border: 3px solid #000000;
+  transform: translate(-3px, -3px);
+  box-shadow: var(--shadow-hard);
 }
+
 .tab-icon {
   font-size: 15px;
   line-height: 1;
@@ -121,8 +214,8 @@ body {
   .sidebar {
     width: 100%;
     border-right: none;
-    border-bottom: 1px solid var(--line);
-    padding: 8px 12px;
+    border-bottom: 4px solid #000000;
+    padding: 10px 12px;
     overflow-x: auto;
   }
   .nav-section-title {
@@ -130,266 +223,518 @@ body {
   }
   .sidebar .tabs {
     flex-direction: row;
-    gap: 6px;
+    gap: 8px;
   }
   .sidebar .tab {
     width: auto;
     white-space: nowrap;
-    border-left: none;
-    border-bottom: 3px solid transparent;
-    border-radius: 6px 6px 0 0;
+    box-shadow: var(--shadow-sm);
   }
   .sidebar .tab[aria-selected="true"] {
-    border-left-color: transparent;
-    border-bottom-color: var(--brand);
+    transform: none;
+    box-shadow: var(--shadow-sm);
   }
 }
 
-.subject-hint { margin: 4px 0 0; font-size: 13px; color: var(--muted); line-height: 1.6; }
-.subject-hint code { font-size: 12px; background: var(--brand-soft); padding: 2px 6px; border-radius: 6px; }
-
-.subject-row { margin-bottom: 18px; }
-.subject-row:last-child { margin-bottom: 0; }
-.subject-role { display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-.subject-line { display: flex; gap: 10px; align-items: flex-start; }
-.subject-line .btn { flex-shrink: 0; }
-.subject-text {
-  flex: 1;
-  padding: 9px 12px;
-  font-size: 14px;
-  line-height: 1.5;
-  border: 1px dashed var(--line);
-  border-radius: 8px;
-  background: #fff;
-  word-break: break-word;
-  min-height: 39px;
-}
-.subject-text:empty::before {
-  content: attr(data-empty);
-  color: var(--muted);
-  font-style: italic;
-}
-.subject-text:not([data-empty]):empty::before {
-  content: "Nhập Lĩnh vực và Nghệ danh/tên ở tab Thư mời…";
-}
-
+/* =====================================================================
+   LAYOUT & PANELS
+   ===================================================================== */
 .layout {
   display: grid;
-  grid-template-columns: minmax(340px, 420px) 1fr;
-  gap: 20px;
-  padding: 20px 24px 40px;
+  grid-template-columns: minmax(360px, 440px) 1fr;
+  gap: 28px;
+  padding: 28px 32px 56px;
   align-items: start;
 }
-@media (max-width: 900px) {
-  .layout { grid-template-columns: 1fr; }
+
+@media (max-width: 960px) {
+  .layout { grid-template-columns: 1fr; padding: 18px; }
 }
 
 .panel {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 18px;
+  background: #FFFFFF;
+  border: 4px solid #000000;
+  border-radius: 0;
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
 }
 
-.field { margin-bottom: 14px; }
-.label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-.label em { color: var(--err); font-style: normal; }
+/* =====================================================================
+   FORM FIELDS & INPUTS
+   ===================================================================== */
+.field { margin-bottom: 18px; }
+
+.label {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  margin-bottom: 8px;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.label em {
+  color: var(--pop-coral);
+  font-style: normal;
+  font-size: 16px;
+}
 
 input[type="text"], input[type="date"] {
   width: 100%;
-  padding: 9px 12px;
+  padding: 11px 14px;
   font-size: 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff;
-  color: var(--ink);
+  font-weight: 600;
+  font-family: inherit;
+  border: 3px solid #000000;
+  border-radius: 0;
+  background: #FFFFFF;
+  color: #000000;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease;
 }
-input:focus { outline: 2px solid var(--brand-soft); border-color: var(--brand); }
-input.invalid { border-color: var(--err); }
 
-.err { margin: 5px 0 0; font-size: 12.5px; color: var(--err); min-height: 0; }
+input[type="text"]::placeholder {
+  color: #6B7280;
+  font-weight: 500;
+}
+
+input:focus {
+  outline: none;
+  background: #FFFDE7;
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-hard);
+}
+
+input.invalid {
+  border-color: #000000;
+  background: #FFEBEE;
+  box-shadow: 3px 3px 0 var(--pop-coral);
+}
+
+.err {
+  margin: 6px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pop-coral);
+  min-height: 0;
+}
 .err:empty { display: none; }
 
+/* Chips gợi ý */
 .field-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-  max-height: 120px;
+  gap: 7px;
+  margin-top: 10px;
+  max-height: 130px;
   overflow-y: auto;
-  padding: 2px 1px;
+  padding: 4px 2px;
 }
+
 .chip {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
-  font-size: 12.5px;
-  color: var(--ink);
-  background: #f1f3f5;
-  border: 1px solid var(--line);
-  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  color: #000000;
+  background: #FFFFFF;
+  border: 2px solid #000000;
+  border-radius: 0;
   cursor: pointer;
   transition: all 0.15s ease;
   user-select: none;
-  font-family: inherit;
+  box-shadow: 2px 2px 0 #000000;
 }
+
 .chip:hover {
-  border-color: var(--brand);
-  background: var(--brand-soft);
-  color: var(--brand-dark);
+  background: var(--pop-yellow);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #000000;
 }
+
 .chip.active {
-  border-color: var(--brand);
-  background: var(--brand);
-  color: #fff;
-  font-weight: 600;
+  background: var(--pop-coral);
+  color: #FFFFFF;
+  border-color: #000000;
+  transform: translate(-2px, -2px);
+  box-shadow: 3px 3px 0 #000000;
 }
 
-.segmented { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+/* =====================================================================
+   SEGMENTED CONTROLS (KMDH / NVTCH / ĐSNH)
+   ===================================================================== */
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
 .seg {
-  display: flex; flex-direction: column; gap: 2px;
-  padding: 10px 8px;
-  border: 1.5px solid var(--line);
-  border-radius: 10px;
-  background: #fff;
-  cursor: pointer;
-  text-align: center;
-  font-family: inherit;
-}
-.seg:hover { border-color: var(--brand); }
-.seg[aria-pressed="true"] {
-  border-color: var(--brand);
-  background: var(--brand-soft);
-}
-.seg-code { font-weight: 700; font-size: 15px; color: var(--brand-dark); }
-.seg-name { font-size: 11px; color: var(--muted); }
-
-.radio-row { display: flex; flex-wrap: wrap; gap: 10px 18px; font-size: 14px; }
-.radio-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
-
-.divider { border: none; border-top: 1px dashed var(--line); margin: 18px 0 10px; }
-.section-title {
-  margin: 0 0 12px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.actions { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.btn {
-  padding: 10px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  border: 1.5px solid var(--brand);
-  border-radius: 10px;
-  background: #fff;
-  color: var(--brand-dark);
-  cursor: pointer;
-  font-family: inherit;
-}
-.btn:hover:not(:disabled) { background: var(--brand-soft); }
-.btn.primary { background: var(--brand); color: #fff; }
-.btn.primary:hover:not(:disabled) { background: var(--brand-dark); }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; border-color: var(--line); color: var(--muted); }
-.btn.small { padding: 6px 12px; font-size: 13px; }
-.hint { margin: 0; font-size: 12.5px; color: var(--err); flex-basis: 100%; }
-
-.preview-head {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 12px;
-}
-.preview-head h2 { margin: 0; font-size: 16px; }
-
-.preview-frame {
-  width: 100%;
-  height: calc(100vh - 220px);
-  min-height: 480px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fff;
-}
-
-.toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 10px 20px;
-  border-radius: 999px;
-  background: var(--ink);
-  color: #fff;
-  font-size: 14px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  z-index: 10;
-}
-
-/* Giao diện xem trước tin nhắn Zalo / Facebook */
-.msg-preview-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 3px;
+  padding: 10px 8px;
+  border: 3px solid #000000;
+  border-radius: 0;
+  background: #FFFFFF;
+  cursor: pointer;
+  text-align: center;
+  font-family: var(--font-heading);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease;
 }
-.msg-card {
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fff;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+
+.seg:hover {
+  background: var(--pop-yellow);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-hard);
 }
-.msg-card-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 14px;
-  background: #fdf8f9;
-  border-bottom: 1px solid var(--line);
+
+.seg[aria-pressed="true"] {
+  background: var(--pop-yellow);
+  border-color: #000000;
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-hard);
 }
-.msg-card-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--brand-dark);
-  display: flex;
-  align-items: center;
-  gap: 8px;
+
+.seg-code {
+  font-weight: 900;
+  font-size: 15px;
+  color: #000000;
 }
-.msg-badge {
-  display: inline-block;
-  padding: 2px 8px;
+
+.seg-name {
   font-size: 11px;
-  font-weight: 600;
-  border-radius: 999px;
-  background: var(--brand-soft);
-  color: var(--brand-dark);
+  font-weight: 700;
+  color: #374151;
+  line-height: 1.25;
 }
-.msg-card-body {
-  padding: 14px 16px;
+
+/* Radios & Checkbox */
+.radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
   font-size: 14px;
-  line-height: 1.65;
-  white-space: pre-wrap;
-  word-break: break-word;
-  color: var(--ink);
-  background: #fafbfc;
-  user-select: text;
+  font-weight: 700;
 }
-.msg-card-body a {
-  color: #1a73e8;
-  text-decoration: underline;
-  word-break: break-all;
+
+.radio-row label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
 }
-.msg-placeholder {
-  color: var(--err);
-  font-weight: 600;
-  background: #fdecea;
-  padding: 1px 5px;
-  border-radius: 4px;
+
+.radio-row input[type="radio"],
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #000000;
+  cursor: pointer;
 }
+
 .checkbox-label {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 13.5px;
+  font-weight: 700;
   cursor: pointer;
   user-select: none;
+}
+
+.divider {
+  border: none;
+  border-top: 3px solid #000000;
+  margin: 22px 0 16px;
+}
+
+.section-title {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-family: var(--font-heading);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #000000;
+  background: var(--pop-blue);
+  color: #FFFFFF;
+  display: inline-block;
+  padding: 2px 8px;
+  border: 2px solid #000000;
+  box-shadow: 2px 2px 0 #000000;
+}
+
+/* =====================================================================
+   BUTTONS (NEUBRUTALISM HARD-EDGE BUTTONS)
+   ===================================================================== */
+.actions {
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn {
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border: 3px solid #000000;
+  border-radius: 0;
+  background: #FFFFFF;
+  color: #000000;
+  cursor: pointer;
+  box-shadow: var(--shadow-hard);
+  transition: all 0.12s ease;
+  user-select: none;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--pop-yellow);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000000;
+}
+
+.btn.primary {
+  background: var(--pop-coral);
+  color: #FFFFFF;
+}
+
+.btn.primary:hover:not(:disabled) {
+  background: #FF3333;
+  color: #FFFFFF;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: #E5E7EB;
+  color: #6B7280;
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn.small {
+  padding: 7px 14px;
+  font-size: 12.5px;
+  border-width: 2.5px;
+  box-shadow: var(--shadow-sm);
+}
+.btn.small:hover:not(:disabled) {
+  box-shadow: var(--shadow-hard);
+}
+
+.hint {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--pop-coral);
+  flex-basis: 100%;
+}
+
+/* =====================================================================
+   PREVIEW PANEL & IFRAME
+   ===================================================================== */
+.preview-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  border-bottom: 3px solid #000000;
+  padding-bottom: 10px;
+}
+
+.preview-head h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 900;
+  font-family: var(--font-heading);
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.preview-frame {
+  width: 100%;
+  height: calc(100vh - 230px);
+  min-height: 520px;
+  border: 3px solid #000000;
+  border-radius: 0;
+  background: #FFFFFF;
+  box-shadow: var(--shadow-hard);
+}
+
+/* =====================================================================
+   CHỦ ĐỀ EMAIL (SUBJECT OUTPUTS)
+   ===================================================================== */
+.subject-row { margin-bottom: 18px; }
+.subject-row:last-child { margin-bottom: 0; }
+
+.subject-role {
+  display: block;
+  font-size: 12px;
+  font-family: var(--font-heading);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #000000;
+  margin-bottom: 6px;
+}
+
+.subject-line {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.subject-line .btn { flex-shrink: 0; }
+
+.subject-text {
+  flex: 1;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  line-height: 1.5;
+  border: 3px solid #000000;
+  border-radius: 0;
+  background: #FFFFFF;
+  color: #000000;
+  box-shadow: var(--shadow-sm);
+  word-break: break-word;
+  min-height: 43px;
+}
+
+.subject-text:empty::before {
+  content: attr(data-empty);
+  color: #6B7280;
+  font-style: italic;
+  font-family: var(--font-body);
+  font-weight: 500;
+}
+.subject-text:not([data-empty]):empty::before {
+  content: "Nhập Lĩnh vực và Nghệ danh/tên ở tab Thư mời…";
+}
+
+/* =====================================================================
+   MESSAGE CARDS (ZALO / FACEBOOK PREVIEW)
+   ===================================================================== */
+.msg-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.msg-card {
+  border: 3px solid #000000;
+  border-radius: 0;
+  background: #FFFFFF;
+  overflow: hidden;
+  box-shadow: var(--shadow-hard);
+  transition: all 0.15s ease;
+}
+
+.msg-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.msg-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: var(--bg-cream);
+  border-bottom: 3px solid #000000;
+}
+
+.msg-card-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  color: #000000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+}
+
+.msg-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 900;
+  font-family: var(--font-heading);
+  background: var(--pop-yellow);
+  border: 2px solid #000000;
+  color: #000000;
+  box-shadow: 2px 2px 0 #000000;
+}
+
+.msg-card-body {
+  padding: 18px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #000000;
+  background: #FFFFFF;
+  user-select: text;
+}
+
+.msg-card-body a {
+  color: #0056B3;
+  font-weight: 700;
+  text-decoration: underline;
+  word-break: break-all;
+}
+.msg-card-body a:hover {
+  background: var(--pop-yellow);
+  color: #000000;
+}
+
+.msg-placeholder {
+  color: #000000;
+  font-weight: 800;
+  background: var(--pop-yellow);
+  border: 1.5px solid #000000;
+  padding: 1px 6px;
+  box-shadow: 1px 1px 0 #000000;
+}
+
+/* =====================================================================
+   TOAST NOTIFICATION (NEUBRUTALISM BANNER)
+   ===================================================================== */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 28px;
+  border: 3px solid #000000;
+  border-radius: 0;
+  background: var(--pop-green);
+  color: #000000;
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
 }

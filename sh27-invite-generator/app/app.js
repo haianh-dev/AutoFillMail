@@ -39,6 +39,7 @@
   var msgNttState = { donVi: '', hoTen: '', ngay: '' };
   var msgNntState = { type: 'kmdh', ngheDanh: '', xungHo: 'anh', tuGoi: 'em', kemLink: true, hoTen: '', ngay: '' };
   var msgQlState = { type: 'kmdh', xungHoQL: 'anh', tenQl: '', ngheDanh: '', xungHoNS: 'anh', tuGoi: 'em', kemLink: true, hoTen: '', ngay: '' };
+  var msgHmttState = { donVi: '', hoTen: '', ngay: '', linkThuMoi: '', linkDangKy: '', lienHe: 'Ms. Thanh Huyền (0335401260)' };
 
   // ---- Phần tử DOM ----
   var $ = function (sel) { return document.querySelector(sel); };
@@ -91,6 +92,8 @@
         if (msgNntInputs.hoTen) msgNntInputs.hoTen.value = saved.hoTen;
         msgQlState.hoTen = saved.hoTen;
         if (msgQlInputs.hoTen) msgQlInputs.hoTen.value = saved.hoTen;
+        msgHmttState.hoTen = saved.hoTen;
+        if (msgHmttInputs.hoTen) msgHmttInputs.hoTen.value = saved.hoTen;
       }
       if (saved.demTen) {
         values.demTen = saved.demTen; inputs.demTen.value = saved.demTen; demTenTouched = true;
@@ -111,6 +114,8 @@
         if (msgNntInputs.ngay) msgNntInputs.ngay.value = saved.ngay;
         msgQlState.ngay = saved.ngay;
         if (msgQlInputs.ngay) msgQlInputs.ngay.value = saved.ngay;
+        msgHmttState.ngay = saved.ngay;
+        if (msgHmttInputs.ngay) msgHmttInputs.ngay.value = saved.ngay;
       }
     } catch (e) { /* localStorage có thể bị chặn — bỏ qua */ }
   }
@@ -229,7 +234,7 @@
   });
 
   // ---- Chuyển tab ----
-  var ALL_TABS = ['invite', 'subject', 'httt', 'httt-ns', 'cam-on', 'ntt', 'bttt', 'msg-ntt', 'msg-nnt', 'msg-ql'];
+  var ALL_TABS = ['invite', 'subject', 'httt', 'httt-ns', 'cam-on', 'ntt', 'bttt', 'msg-ntt', 'msg-nnt', 'msg-ql', 'msg-hmtt'];
   Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (tab) {
     tab.addEventListener('click', function () {
       Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (t) {
@@ -264,6 +269,12 @@
           if (msgQlInputs.ngheDanh) msgQlInputs.ngheDanh.value = msgQlState.ngheDanh;
         }
         renderMsgQl();
+      } else if (curTab === 'msg-hmtt') {
+        if (!msgHmttState.donVi && btttState.donViBttt) {
+          msgHmttState.donVi = btttState.donViBttt;
+          if (msgHmttInputs.donVi) msgHmttInputs.donVi.value = btttState.donViBttt;
+        }
+        renderMsgHmtt();
       }
     });
   });
@@ -650,7 +661,7 @@
   });
 
   // ==========================================
-  // LOGIC TAB NHẮN ZALO / FB (NTT & NNT)
+  // LOGIC TAB NHẮN ZALO / FB (NTT, NNT & HMTT)
   // ==========================================
   var msgNttInputs = {
     donVi: $('#f-msg-ntt-donVi'),
@@ -665,6 +676,15 @@
     kemLink: $('#f-msg-nnt-kemLink'),
   };
   var msgNntTypeGroup = $('#msg-nnt-type-group');
+
+  var msgHmttInputs = {
+    donVi: $('#f-msg-hmtt-donVi'),
+    hoTen: $('#f-msg-hmtt-hoTen'),
+    ngay: $('#f-msg-hmtt-ngay'),
+    linkThuMoi: $('#f-msg-hmtt-linkThuMoi'),
+    linkDangKy: $('#f-msg-hmtt-linkDangKy'),
+    lienHe: $('#f-msg-hmtt-lienHe'),
+  };
 
   function formatMsgPreviewHtml(rawText) {
     var escaped = F.escapeHtml(rawText);
@@ -1079,6 +1099,168 @@
   var btnCopyMsgQlAllTop = $('#btn-copy-msg-ql-all-top');
   if (btnCopyMsgQlAllTop) btnCopyMsgQlAllTop.addEventListener('click', copyAllMsgQl);
 
+  // ---- XÂY DỰNG TIN NHẮN HIẾN MÁU TẬP THỂ (HMTT) ----
+  function buildMsgHmttData() {
+    var donVi = msgHmttState.donVi.trim();
+    var hoTen = msgHmttState.hoTen.trim();
+    var ngay = msgHmttState.ngay.trim();
+    var linkThuMoi = msgHmttState.linkThuMoi.trim();
+    var linkDangKy = msgHmttState.linkDangKy.trim();
+    var lienHe = msgHmttState.lienHe.trim();
+
+    var donViDisp = donVi || '[Tên đơn vị]';
+    var hoTenDisp = hoTen || '[Tên của bạn]';
+    var ngayDisp = ngay ? F.formatDateVN(ngay) : '[../../2026]';
+    var lienHeDisp = lienHe || 'Ms. Thanh Huyền (0335401260)';
+    var thuMoiDisp = linkThuMoi || '[THƯ MỜI]';
+    var dangKyDisp = linkDangKy || '[Link Đăng Ký]';
+
+    var msg1 = 'Dear ' + donViDisp + ',\n\n' +
+      'Lời đầu tiên, thay mặt Ban Tổ chức xin gửi lời chúc sức khỏe và lời chào trân trọng nhất đến ' + donViDisp + '.\n\n' +
+      'Mình là ' + hoTenDisp + ' - Phụ trách Đối ngoại tại Ngày hội hiến máu Sắc Hồng Hy Vọng lần thứ XXVII - Chương trình hiến máu toàn trường lớn nhất trong các trường trực thuộc Đại học Quốc gia Hà Nội.';
+
+    var msg2 = 'Qua tìm hiểu chi tiết về phương hướng hoạt động và tầm nhìn của ' + donViDisp + ', Sắc Hồng Hy Vọng lần thứ XXVII gửi lời mời hợp tác đến ' + donViDisp + ' với tư cách ĐƠN VỊ HIẾN MÁU TẬP THỂ cho sự kiện.\n\n' +
+      'Đôi lời về Ngày hội, Sắc Hồng Hy Vọng lần thứ XXVII được tổ chức bởi CLB Sinh viên vận động hiến máu Trường Đại học Công nghệ, ĐTN - HSV Trường Đại học Công nghệ - ĐHQGHN, BCH Đoàn Đại học Quốc gia Hà Nội phối hợp với Viện Huyết học - Truyền máu Trung ương.\n\n' +
+      'Ngày hội hiến máu Sắc Hồng Hy Vọng lần thứ XXVII với thông điệp “Thanh niên Việt Nam - Sẵn sàng hiến máu” không chỉ là cơ hội để những bạn trẻ được rèn luyện sự tự tin, năng động, sáng tạo, tràn đầy nhiệt huyết và đam mê với hoạt động tình nguyện; mà còn là nơi để các bạn trẻ được trải nghiệm và trưởng thành bằng những hành động có ích cho xã hội.\n\n' +
+      'Với tất cả tâm huyết của Ban Tổ chức, mong Quý Đơn vị ghé thăm thư mời ngày hội để hiểu được những tình cảm chân thành của Ban Tổ chức. Đồng thời, Quý Đơn vị có thể đăng ký hiến máu tập thể qua đường link đăng ký hiến máu.\n\n' +
+      '📄 Thư mời: ' + thuMoiDisp + '\n' +
+      '🔗 Link Đăng Ký: ' + dangKyDisp + '\n\n' +
+      'Quý Đơn vị thân mến, sự đồng hành của Quý Đơn vị sẽ là động lực to lớn tiếp thêm sức mạnh cho chúng mình để tạo nên một ngày hội bùng nổ, Sắc Hồng Hy Vọng XXVII luôn sẵn sàng đón tiếp những trái tim yêu thương vào NGÀY CHÍNH HỘI sắp tới đây.';
+
+    var msg3 = 'Để có thể chuẩn bị tốt nhất cho sự kiện, Ban Tổ chức Sắc Hồng Hy Vọng lần thứ XXVII rất mong nhận được hồi âm từ ' + donViDisp + ' trước ngày ' + ngayDisp + ' ạ.\n\n' +
+      'Quý Đơn vị có thể liên hệ ' + lienHeDisp + ' hoặc phản hồi trực tiếp tin nhắn này để biết thêm thông tin chi tiết.\n\n' +
+      'Chúc ' + donViDisp + ' có một ngày tốt lành!';
+
+    var msg4 = 'Khi tham gia hiến máu Quý Đơn vị mang theo đầy đủ giấy tờ tùy thân và tuân thủ theo sự hướng dẫn của các y bác sĩ tại điểm. Để rút ngắn thời gian đăng ký và đảm bảo Quý Đơn vị được chăm sóc trước và sau khi tham gia hiến máu, Ban tổ chức lưu ý Quý Đơn vị đăng ký hiến máu trước tại link đăng ký hoặc App hiến máu.';
+
+    return {
+      msg1: msg1,
+      msg2: msg2,
+      msg3: msg3,
+      msg4: msg4,
+      donVi: donVi,
+      hoTen: hoTen,
+      ngay: ngay,
+      lienHe: lienHe,
+    };
+  }
+
+  function renderMsgHmtt() {
+    var d = buildMsgHmttData();
+
+    var p1 = $('#preview-msg-hmtt-1');
+    var p2 = $('#preview-msg-hmtt-2');
+    var p3 = $('#preview-msg-hmtt-3');
+    var p4 = $('#preview-msg-hmtt-4');
+
+    if (p1) p1.innerHTML = formatMsgPreviewHtml(d.msg1);
+    if (p2) p2.innerHTML = formatMsgPreviewHtml(d.msg2);
+    if (p3) p3.innerHTML = formatMsgPreviewHtml(d.msg3);
+    if (p4) p4.innerHTML = formatMsgPreviewHtml(d.msg4);
+
+    document.querySelectorAll('[data-err-msg-hmtt]').forEach(function (el) {
+      el.textContent = '';
+    });
+    if (!d.donVi) {
+      var eDv = $('[data-err-msg-hmtt="donVi"]');
+      if (eDv) eDv.textContent = 'Vui lòng nhập tên đơn vị / đối tác.';
+    }
+    if (!d.hoTen) {
+      var eHt = $('[data-err-msg-hmtt="hoTen"]');
+      if (eHt) eHt.textContent = 'Vui lòng nhập tên của bạn.';
+    }
+    if (!d.ngay) {
+      var eNg = $('[data-err-msg-hmtt="ngay"]');
+      if (eNg) eNg.textContent = 'Vui lòng chọn hạn phản hồi.';
+    }
+    if (!d.lienHe) {
+      var eLh = $('[data-err-msg-hmtt="lienHe"]');
+      if (eLh) eLh.textContent = 'Vui lòng nhập thông tin liên hệ.';
+    }
+  }
+
+  if (msgHmttInputs.donVi) {
+    msgHmttInputs.donVi.addEventListener('input', function () {
+      msgHmttState.donVi = msgHmttInputs.donVi.value;
+      renderMsgHmtt();
+    });
+  }
+  if (msgHmttInputs.hoTen) {
+    msgHmttInputs.hoTen.addEventListener('input', function () {
+      msgHmttState.hoTen = msgHmttInputs.hoTen.value;
+      saveSender({ hoTen: msgHmttState.hoTen });
+      renderMsgHmtt();
+    });
+  }
+  if (msgHmttInputs.ngay) {
+    msgHmttInputs.ngay.addEventListener('input', function () {
+      msgHmttState.ngay = msgHmttInputs.ngay.value;
+      saveSender({ ngay: msgHmttState.ngay });
+      renderMsgHmtt();
+    });
+  }
+  if (msgHmttInputs.linkThuMoi) {
+    msgHmttInputs.linkThuMoi.addEventListener('input', function () {
+      msgHmttState.linkThuMoi = msgHmttInputs.linkThuMoi.value;
+      renderMsgHmtt();
+    });
+  }
+  if (msgHmttInputs.linkDangKy) {
+    msgHmttInputs.linkDangKy.addEventListener('input', function () {
+      msgHmttState.linkDangKy = msgHmttInputs.linkDangKy.value;
+      renderMsgHmtt();
+    });
+  }
+  if (msgHmttInputs.lienHe) {
+    msgHmttInputs.lienHe.addEventListener('input', function () {
+      msgHmttState.lienHe = msgHmttInputs.lienHe.value;
+      renderMsgHmtt();
+    });
+  }
+
+  var btnCopyMsgHmtt1 = $('#btn-copy-msg-hmtt-1');
+  if (btnCopyMsgHmtt1) {
+    btnCopyMsgHmtt1.addEventListener('click', function () {
+      copyPlainText(buildMsgHmttData().msg1, 'tin nhắn 1');
+    });
+  }
+  var btnCopyMsgHmtt2 = $('#btn-copy-msg-hmtt-2');
+  if (btnCopyMsgHmtt2) {
+    btnCopyMsgHmtt2.addEventListener('click', function () {
+      copyPlainText(buildMsgHmttData().msg2, 'tin nhắn 2');
+    });
+  }
+  var btnCopyMsgHmtt3 = $('#btn-copy-msg-hmtt-3');
+  if (btnCopyMsgHmtt3) {
+    btnCopyMsgHmtt3.addEventListener('click', function () {
+      copyPlainText(buildMsgHmttData().msg3, 'tin nhắn 3');
+    });
+  }
+  var btnCopyMsgHmtt4 = $('#btn-copy-msg-hmtt-4');
+  if (btnCopyMsgHmtt4) {
+    btnCopyMsgHmtt4.addEventListener('click', function () {
+      copyPlainText(buildMsgHmttData().msg4, 'tin nhắn 4');
+    });
+  }
+
+  function copyInviteMsgHmtt() {
+    var d = buildMsgHmttData();
+    var all = 'tin nhắn 1\n' + d.msg1 + '\n\ntin nhắn 2\n' + d.msg2 + '\n\ntin nhắn 3\n' + d.msg3;
+    copyPlainText(all, 'lời mời (tin 1, 2 & 3)');
+  }
+  var btnCopyMsgHmttInvite = $('#btn-copy-msg-hmtt-invite');
+  if (btnCopyMsgHmttInvite) btnCopyMsgHmttInvite.addEventListener('click', copyInviteMsgHmtt);
+
+  function copyAllMsgHmtt() {
+    var d = buildMsgHmttData();
+    var all = 'tin nhắn 1\n' + d.msg1 + '\n\ntin nhắn 2\n' + d.msg2 + '\n\ntin nhắn 3\n' + d.msg3 + '\n\ntin nhắn 4 (sau khi đồng ý)\n' + d.msg4;
+    copyPlainText(all, 'toàn bộ 4 tin nhắn');
+  }
+  var btnCopyMsgHmttAll = $('#btn-copy-msg-hmtt-all');
+  if (btnCopyMsgHmttAll) btnCopyMsgHmttAll.addEventListener('click', copyAllMsgHmtt);
+  var btnCopyMsgHmttAllTop = $('#btn-copy-msg-hmtt-all-top');
+  if (btnCopyMsgHmttAllTop) btnCopyMsgHmttAllTop.addEventListener('click', copyAllMsgHmtt);
+
   // ---- Khởi động ----
   loadSender();
   renderSubjects();
@@ -1093,4 +1275,5 @@
   renderMsgNtt();
   renderMsgNnt();
   renderMsgQl();
+  renderMsgHmtt();
 })();

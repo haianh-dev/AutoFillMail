@@ -4,12 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SH27 · Thư mời &amp; Tin nhắn Đối ngoại</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Space+Grotesk:wght@600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="topbar">
   <h1>SH27 · Thư mời &amp; Tin nhắn Đối ngoại</h1>
-  <p class="sub">Ngày hội hiến máu Sắc Hồng Hy Vọng lần thứ XXVII — Ban Đối ngoại</p>
+  <p class="sub">★ Ngày hội hiến máu Sắc Hồng Hy Vọng lần thứ XXVII — Ban Đối ngoại</p>
 </header>
 
 <div id="no-templates" class="banner-error" hidden>
@@ -32,6 +35,7 @@
       <button type="button" class="tab" data-tab="msg-ntt" aria-selected="false"><span class="tab-icon">💬</span> Nhắn Zalo/FB — NTT</button>
       <button type="button" class="tab" data-tab="msg-nnt" aria-selected="false"><span class="tab-icon">💬</span> Nhắn Zalo/FB — NNT</button>
       <button type="button" class="tab" data-tab="msg-ql" aria-selected="false"><span class="tab-icon">💬</span> Nhắn Zalo/FB — Quản lý NS</button>
+      <button type="button" class="tab" data-tab="msg-hmtt" aria-selected="false"><span class="tab-icon">🩸</span> Nhắn Zalo/FB — Hiến máu tập thể</button>
     </nav>
   </aside>
 
@@ -814,6 +818,94 @@
           <button type="button" class="btn small" id="btn-copy-msg-ql-3">Sao chép tin 3</button>
         </div>
         <div class="msg-card-body" id="preview-msg-ql-3"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<main class="layout" id="tab-msg-hmtt" hidden>
+  <section class="panel form-panel">
+    <div class="field">
+      <label class="label" for="f-msg-hmtt-donVi">Tên đơn vị / Đối tác <em>*</em></label>
+      <input id="f-msg-hmtt-donVi" type="text" maxlength="120" placeholder="Ví dụ: Đoàn Thanh niên Học viện ABC / CLB XYZ / Quý Đơn vị">
+      <p class="err" data-err-msg-hmtt="donVi"></p>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f-msg-hmtt-hoTen">Tên của bạn <em>*</em></label>
+      <input id="f-msg-hmtt-hoTen" type="text" maxlength="80" placeholder="Ví dụ: Hải Anh">
+      <p class="err" data-err-msg-hmtt="hoTen"></p>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f-msg-hmtt-ngay">Hạn phản hồi (trước ngày) <em>*</em></label>
+      <input id="f-msg-hmtt-ngay" type="date">
+      <p class="err" data-err-msg-hmtt="ngay"></p>
+    </div>
+
+    <div class="field">
+      <label class="label" for="f-msg-hmtt-linkThuMoi">Link Thư mời (tuỳ chọn)</label>
+      <input id="f-msg-hmtt-linkThuMoi" type="text" placeholder="Dán link Google Drive Thư mời (nếu có)">
+    </div>
+
+    <div class="field">
+      <label class="label" for="f-msg-hmtt-linkDangKy">Link Đăng ký hiến máu (tuỳ chọn)</label>
+      <input id="f-msg-hmtt-linkDangKy" type="text" placeholder="Dán link form đăng ký (nếu có)">
+    </div>
+
+    <div class="field">
+      <label class="label" for="f-msg-hmtt-lienHe">Người / Số điện thoại liên hệ <em>*</em></label>
+      <input id="f-msg-hmtt-lienHe" type="text" maxlength="100" value="Ms. Thanh Huyền (0335401260)">
+      <p class="err" data-err-msg-hmtt="lienHe"></p>
+    </div>
+
+    <div class="actions">
+      <button id="btn-copy-msg-hmtt-invite" type="button" class="btn primary">Sao chép lời mời (Tin 1, 2 &amp; 3)</button>
+      <button id="btn-copy-msg-hmtt-all" type="button" class="btn">Sao chép tất cả (cả tin 4)</button>
+    </div>
+  </section>
+
+  <section class="panel preview-panel">
+    <div class="preview-head">
+      <h2>Xem trước tin nhắn Zalo / Facebook (Hiến máu tập thể)</h2>
+      <button id="btn-copy-msg-hmtt-all-top" type="button" class="btn small">Sao chép tất cả</button>
+    </div>
+
+    <div class="msg-preview-list">
+      <!-- Tin nhắn 1 -->
+      <div class="msg-card">
+        <div class="msg-card-head">
+          <span class="msg-card-title"><span class="msg-badge">Tin nhắn 1</span> Lời chào &amp; Giới thiệu</span>
+          <button type="button" class="btn small" id="btn-copy-msg-hmtt-1">Sao chép tin 1</button>
+        </div>
+        <div class="msg-card-body" id="preview-msg-hmtt-1"></div>
+      </div>
+
+      <!-- Tin nhắn 2 -->
+      <div class="msg-card">
+        <div class="msg-card-head">
+          <span class="msg-card-title"><span class="msg-badge">Tin nhắn 2</span> Lời mời hợp tác &amp; Giới thiệu ngày hội</span>
+          <button type="button" class="btn small" id="btn-copy-msg-hmtt-2">Sao chép tin 2</button>
+        </div>
+        <div class="msg-card-body" id="preview-msg-hmtt-2"></div>
+      </div>
+
+      <!-- Tin nhắn 3 -->
+      <div class="msg-card">
+        <div class="msg-card-head">
+          <span class="msg-card-title"><span class="msg-badge">Tin nhắn 3</span> Hạn phản hồi &amp; Liên hệ</span>
+          <button type="button" class="btn small" id="btn-copy-msg-hmtt-3">Sao chép tin 3</button>
+        </div>
+        <div class="msg-card-body" id="preview-msg-hmtt-3"></div>
+      </div>
+
+      <!-- Tin nhắn 4 -->
+      <div class="msg-card">
+        <div class="msg-card-head">
+          <span class="msg-card-title"><span class="msg-badge">Tin nhắn 4</span> Sau khi được phản hồi (nếu đồng ý)</span>
+          <button type="button" class="btn small" id="btn-copy-msg-hmtt-4">Sao chép tin 4</button>
+        </div>
+        <div class="msg-card-body" id="preview-msg-hmtt-4"></div>
       </div>
     </div>
   </section>
