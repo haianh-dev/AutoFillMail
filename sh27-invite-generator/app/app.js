@@ -1111,7 +1111,7 @@
 
     var donViDisp = donVi || '[...]';
     var hoTenDisp = hoTen || '[...]';
-    var ngayDisp = ngay ? F.formatDateVN(ngay) : '…';
+    var ngayDisp = ngay ? F.formatDate(ngay) : '…';
 
     var msg1 = 'Dear ' + donViDisp + ',\n' +
       'Lời đầu tiên, thay mặt Ban Tổ chức xin gửi lời chúc sức khỏe và lời chào trân trọng nhất đến ' + donViDisp + '.\n' +
