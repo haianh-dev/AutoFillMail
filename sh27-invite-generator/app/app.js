@@ -1113,34 +1113,36 @@
     var hoTenDisp = hoTen || '[...]';
     var ngayDisp = ngay ? F.formatDateVN(ngay) : '…';
 
-    var msg1 = 'Dear ' + donViDisp + ',\n\n' +
-      'Lời đầu tiên, thay mặt Ban Tổ chức xin gửi lời chúc sức khỏe và lời chào trân trọng nhất đến ' + donViDisp + '.\n\n' +
+    var msg1 = 'Dear ' + donViDisp + ',\n' +
+      'Lời đầu tiên, thay mặt Ban Tổ chức xin gửi lời chúc sức khỏe và lời chào trân trọng nhất đến ' + donViDisp + '.\n' +
       'Mình là ' + hoTenDisp + ' - Phụ trách Đối ngoại tại Ngày hội hiến máu Sắc Hồng Hy Vọng lần thứ XXVII - Chương trình hiến máu toàn trường lớn nhất trong các trường trực thuộc Đại học Quốc gia Hà Nội.';
 
-    var msg2 = 'Qua tìm hiểu chi tiết về phương hướng hoạt động và tầm nhìn của ' + donViDisp + ', Sắc Hồng Hy Vọng lần thứ XXVII gửi lời mời hợp tác đến ' + donViDisp + ' với tư cách ĐƠN VỊ HIẾN MÁU TẬP THỂ cho sự kiện.\n\n' +
-      'Đôi lời về Ngày hội, Sắc Hồng Hy Vọng lần thứ XXVII được tổ chức bởi CLB Sinh viên vận động hiến máu Trường Đại học Công nghệ, ĐTN - HSV Trường Đại học Công nghệ - ĐHQGHN, BCH Đoàn Đại học Quốc gia Hà Nội phối hợp với Viện Huyết học - Truyền máu Trung ương.\n\n' +
-      'Ngày hội hiến máu Sắc Hồng Hy Vọng lần thứ XXVII với thông điệp “Thanh niên Việt Nam - Sẵn sàng hiến máu” không chỉ là cơ hội để những bạn trẻ được rèn luyện sự tự tin, năng động, sáng tạo, tràn đầy nhiệt huyết và đam mê với hoạt động tình nguyện; mà còn là nơi để các bạn trẻ được trải nghiệm và trưởng thành bằng những hành động có ích cho xã hội.\n\n' +
+    var msg2 = 'Qua tìm hiểu chi tiết về phương hướng hoạt động và tầm nhìn của ' + donViDisp + ', Sắc Hồng Hy Vọng lần thứ XXVII gửi lời mời hợp tác đến ' + donViDisp + ' với tư cách ĐƠN VỊ HIẾN MÁU TẬP THỂ cho sự kiện.';
+
+    var msg3 = 'Đôi lời về Ngày hội, Sắc Hồng Hy Vọng lần thứ XXVII được tổ chức bởi CLB Sinh viên vận động hiến máu Trường Đại học Công nghệ, ĐTN - HSV Trường Đại học Công nghệ - ĐHQGHN, BCH Đoàn Đại học Quốc gia Hà Nội phối hợp với Viện Huyết học - Truyền máu Trung ương.\n' +
+      'Ngày hội hiến máu Sắc Hồng Hy Vọng lần thứ XXVII với thông điệp “Thanh niên Việt Nam - Sẵn sàng hiến máu” không chỉ là cơ hội để những bạn trẻ được rèn luyện sự tự tin, năng động, sáng tạo, tràn đầy nhiệt huyết và đam mê với hoạt động tình nguyện; mà còn là nơi để các bạn trẻ được trải nghiệm và trưởng thành bằng những hành động có ích cho xã hội.\n' +
       'Với tất cả tâm huyết của Ban Tổ chức, mong Quý Đơn vị ghé thăm thư mời ngày hội để hiểu được những tình cảm chân thành của Ban Tổ chức. Đồng thời, Quý Đơn vị có thể đăng ký hiến máu tập thể qua đường link đăng ký hiến máu.';
 
     if (kemLink) {
-      msg2 += '\n\n📄 [THƯ MỜI]: ' + HMTT_LINKS.thuMoi + '\n' +
-        '🔗 [Link Đăng Ký]: ' + HMTT_LINKS.dangKy;
+      msg3 += '\n[THƯ MỜI: ' + HMTT_LINKS.thuMoi + ']\n' +
+        '[Link Đăng Ký: ' + HMTT_LINKS.dangKy + ']';
     }
 
-    msg2 += '\n\nQuý Đơn vị thân mến, sự đồng hành của Quý Đơn vị sẽ là động lực to lớn tiếp thêm sức mạnh cho chúng mình để tạo nên một ngày hội bùng nổ, Sắc Hồng Hy Vọng XXVII luôn sẵn sàng đón tiếp những trái tim yêu thương vào NGÀY CHÍNH HỘI sắp tới đây.';
+    var msg4 = 'Quý Đơn vị thân mến, sự đồng hành của Quý Đơn vị sẽ là động lực to lớn tiếp thêm sức mạnh cho chúng mình để tạo nên một ngày hội bùng nổ, Sắc Hồng Hy Vọng XXVII luôn sẵn sàng đón tiếp những trái tim yêu thương vào NGÀY CHÍNH HỘI sắp tới đây.';
 
-    var msg3 = 'Để có thể chuẩn bị tốt nhất cho sự kiện, Ban Tổ chức Sắc Hồng Hy Vọng lần thứ XXVII rất mong nhận được hồi âm từ ' + donViDisp + ' trước ngày ' + ngayDisp + '.\n\n' +
-      'Quý Đơn vị có thể phản hồi trực tiếp tin nhắn này để biết thêm thông tin chi tiết.\n\n' +
+    var msg5 = 'Để có thể chuẩn bị tốt nhất cho sự kiện, Ban Tổ chức Sắc Hồng Hy Vọng lần thứ XXVII rất mong nhận được hồi âm từ ' + donViDisp + ' trước ngày ' + ngayDisp + '.\n' +
+      'Quý Đơn vị có thể liên hệ Ms. Thanh Huyền (0335401260) hoặc phản hồi trực tiếp tin nhắn này để biết thêm thông tin chi tiết.\n' +
       'Chúc ' + donViDisp + ' có một ngày tốt lành!';
 
-    var msg4 = 'Sau khi được phản hồi, nếu đồng ý:\n\n' +
-      'Khi tham gia hiến máu Quý Đơn vị mang theo đầy đủ giấy tờ tùy thân và tuân thủ theo sự hướng dẫn của các y bác sĩ tại điểm. Để rút ngắn thời gian đăng ký và đảm bảo Quý Đơn vị được chăm sóc trước và sau khi tham gia hiến máu, Ban tổ chức lưu ý Quý Đơn vị đăng ký hiến máu trước tại link đăng ký hoặc App hiến máu.';
+    var msg6 = 'Khi tham gia hiến máu Quý Đơn vị mang theo đầy đủ giấy tờ tùy thân và tuân thủ theo sự hướng dẫn của các y bác sĩ tại điểm. Để rút ngắn thời gian đăng ký và đảm bảo Quý Đơn vị được chăm sóc trước và sau khi tham gia hiến máu, Ban tổ chức lưu ý Quý Đơn vị đăng ký hiến máu trước tại link đăng ký hoặc App hiến máu.';
 
     return {
       msg1: msg1,
       msg2: msg2,
       msg3: msg3,
       msg4: msg4,
+      msg5: msg5,
+      msg6: msg6,
       donVi: donVi,
       hoTen: hoTen,
       ngay: ngay,
@@ -1154,11 +1156,15 @@
     var p2 = $('#preview-msg-hmtt-2');
     var p3 = $('#preview-msg-hmtt-3');
     var p4 = $('#preview-msg-hmtt-4');
+    var p5 = $('#preview-msg-hmtt-5');
+    var p6 = $('#preview-msg-hmtt-6');
 
     if (p1) p1.innerHTML = formatMsgPreviewHtml(d.msg1);
     if (p2) p2.innerHTML = formatMsgPreviewHtml(d.msg2);
     if (p3) p3.innerHTML = formatMsgPreviewHtml(d.msg3);
     if (p4) p4.innerHTML = formatMsgPreviewHtml(d.msg4);
+    if (p5) p5.innerHTML = formatMsgPreviewHtml(d.msg5);
+    if (p6) p6.innerHTML = formatMsgPreviewHtml(d.msg6);
 
     document.querySelectorAll('[data-err-msg-hmtt]').forEach(function (el) {
       el.textContent = '';
@@ -1228,19 +1234,31 @@
       copyPlainText(buildMsgHmttData().msg4, 'tin nhắn 4');
     });
   }
+  var btnCopyMsgHmtt5 = $('#btn-copy-msg-hmtt-5');
+  if (btnCopyMsgHmtt5) {
+    btnCopyMsgHmtt5.addEventListener('click', function () {
+      copyPlainText(buildMsgHmttData().msg5, 'tin nhắn 5');
+    });
+  }
+  var btnCopyMsgHmtt6 = $('#btn-copy-msg-hmtt-6');
+  if (btnCopyMsgHmtt6) {
+    btnCopyMsgHmtt6.addEventListener('click', function () {
+      copyPlainText(buildMsgHmttData().msg6, 'tin nhắn hướng dẫn khi đồng ý');
+    });
+  }
 
   function copyInviteMsgHmtt() {
     var d = buildMsgHmttData();
-    var all = 'tin nhắn 1\n' + d.msg1 + '\n\ntin nhắn 2\n' + d.msg2 + '\n\ntin nhắn 3\n' + d.msg3;
-    copyPlainText(all, 'lời mời (tin 1, 2 & 3)');
+    var all = 'tin nhắn 1\n' + d.msg1 + '\n\ntin nhắn 2\n' + d.msg2 + '\n\ntin nhắn 3\n' + d.msg3 + '\n\ntin nhắn 4\n' + d.msg4 + '\n\ntin nhắn 5\n' + d.msg5;
+    copyPlainText(all, 'lời mời (tin 1-5)');
   }
   var btnCopyMsgHmttInvite = $('#btn-copy-msg-hmtt-invite');
   if (btnCopyMsgHmttInvite) btnCopyMsgHmttInvite.addEventListener('click', copyInviteMsgHmtt);
 
   function copyAllMsgHmtt() {
     var d = buildMsgHmttData();
-    var all = 'tin nhắn 1\n' + d.msg1 + '\n\ntin nhắn 2\n' + d.msg2 + '\n\ntin nhắn 3\n' + d.msg3 + '\n\ntin nhắn 4 (sau khi đồng ý)\n' + d.msg4;
-    copyPlainText(all, 'toàn bộ 4 tin nhắn');
+    var all = 'tin nhắn 1\n' + d.msg1 + '\n\ntin nhắn 2\n' + d.msg2 + '\n\ntin nhắn 3\n' + d.msg3 + '\n\ntin nhắn 4\n' + d.msg4 + '\n\ntin nhắn 5\n' + d.msg5 + '\n\n- Sau khi được phản hồi, nếu đồng ý:\n' + d.msg6;
+    copyPlainText(all, 'toàn bộ các tin nhắn');
   }
   var btnCopyMsgHmttAll = $('#btn-copy-msg-hmtt-all');
   if (btnCopyMsgHmttAll) btnCopyMsgHmttAll.addEventListener('click', copyAllMsgHmtt);
