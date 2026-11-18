@@ -1100,7 +1100,7 @@
   // ---- XÂY DỰNG TIN NHẮN HIẾN MÁU TẬP THỂ (HMTT) ----
   var HMTT_LINKS = {
     thuMoi: 'https://drive.google.com/file/d/1tzMOkvVZoMT0RvA7EwoNdr85Isl4Xb9o/view?usp=sharing',
-    dangKy: 'https://docs.google.com/forms/d/e/1FAIpQLScV_h4SwqUjGOimV_l70XQdo3BB6tzox6mDoBrdhWqsZ3LPAw/viewform?usp=send_form',
+    dangKy: 'https://hoimau.vn/dang-ky/sachonghyvongxxvii',
   };
 
   function buildMsgHmttData() {
